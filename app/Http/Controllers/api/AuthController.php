@@ -21,28 +21,35 @@ class AuthController extends Controller
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
-        $credentials = $request->only('email', 'password');
-        $token = Auth::attempt($credentials);
-        $etat = true;
 
-        if (!$token || $etat==false) {
-            return response()->json([
-                'message' => 'Unauthorized',
-            ], 401);
+        $credentials = $request->only('email', 'password');
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password) || !$user->etat) {
+            return response()->json(['message' => 'Vous n\'êtes pas autorisé à effectuer cette action car les informations d\'identification sont incorrectes ou le compte est désactivé'], 401);
         }
 
-        $user = Auth::user();
+        $token = Auth::attempt($credentials);
+
+        if (!$token) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token);
+    }
+
+    protected function respondWithToken($token)
+    {
         return response()->json([
-            'user' => $user,
+            'user' => Auth::user(),
             'authorization' => [
                 'token' => $token,
                 'type' => 'bearer',
-                'message' => 'Vous vous êtes connectés avec succès',
-
-            ]
+                'message' => 'Vous vous êtes connecté avec succès',
+            ],
         ]);
     }
- 
+
     public function userInformation()
     {
         return response()->json(auth()->user());
@@ -69,4 +76,3 @@ class AuthController extends Controller
 
    
 }
-

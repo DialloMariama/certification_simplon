@@ -5,11 +5,12 @@ namespace App\Http\Controllers\api;
 use App\Models\User;
 use App\Models\Proprietaire;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\StoreProprietaireRequest;
 use App\Http\Requests\UpdateProprietaireRequest;
-use App\Http\Controllers\Controller;
 
 
 class ProprietaireController extends Controller
@@ -17,7 +18,6 @@ class ProprietaireController extends Controller
 
     public function registerProprietaire(Request $request)
     {
-        // dd($request->all());
         try {
             $request->validate([
                 'nom' => 'required|string|max:255',
@@ -30,7 +30,7 @@ class ProprietaireController extends Controller
             ]);
 
             $user = new User();
-            $etudiant = new Proprietaire();
+            $proprietaire = new Proprietaire();
 
             $user->nom = $request->input('nom');
             $user->prenom = $request->input('prenom');
@@ -41,12 +41,12 @@ class ProprietaireController extends Controller
             $user->password = Hash::make($request->password);
 
             $user->save();
-            $etudiant->user_id = $user->id;
+            $proprietaire->user_id = $user->id;
 
-            if ($etudiant->save()) {
+            if ($proprietaire->save()) {
                 return response()->json([
                     "message" => "Etudiant enregistré avec success",
-                    "etudiant" => array_merge(array($etudiant), array($user))
+                    "proprietaire" => array_merge(array($proprietaire), array($user))
                 ]);
             } else {
                 $user->delete();
@@ -58,6 +58,48 @@ class ProprietaireController extends Controller
             ], 422);
         }
     }
+
+    public function updateProprietaire(Request $request)
+{
+    try {
+        $user = Auth::user();
+
+        $request->validate([
+            'nom' => 'required|string|max:255',
+            'prenom' => 'required|string|max:255',
+            'adresse' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'telephone' => 'nullable|numeric|regex:/^[0-9]{9}$/',
+        ]);
+
+        $user = User::findOrFail($user->id);
+        $proprietaire = Proprietaire::where('user_id', $user->id)->first();
+        if (!$proprietaire) {
+            return response()->json(['error' => 'Étudiant non trouvé'], 404);
+        }
+
+        $user->nom = $request->input('nom', $user->nom);
+        $user->prenom = $request->input('prenom', $user->prenom);
+        $user->email = $request->input('email', $user->email);
+        $user->adresse = $request->input('adresse', $user->adresse);
+        $user->telephone = $request->input('telephone', $user->telephone);
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        if ($user->save() && $proprietaire->save()) {
+            return response()->json([
+                "message" => 'Informations mises à jour avec succès',
+            ]);
+        } else {
+            return response()->json(["message" => "La mise à jour a échoué"]);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
     /**
      * Display a listing of the resource.
      */
