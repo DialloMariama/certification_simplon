@@ -27,7 +27,18 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'role',
     ];
-
+    public function userable()
+    {
+        return $this->morphTo();
+    }
+    public function etudiants()
+    {
+        return $this->belongsTo(Etudiant::class);
+    }
+    public function proprietaires()
+    {
+        return $this->belongsTo(Proprietaire::class);
+    }
    
     /**
      * The attributes that should be hidden for serialization.
