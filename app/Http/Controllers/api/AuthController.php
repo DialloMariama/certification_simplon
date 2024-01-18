@@ -73,6 +73,46 @@ class AuthController extends Controller
             ]
         ]);
     }
-
+    public function bloquerUser(User $user)
+    {
+        $statusMessage = $user->etat ? 'L\'utilisateur a été bloqué avec succès' : 'Le user est déjà bloqué.';
+        $statusCode = $user->etat ? 200 : 400;
+    
+        $user->etat = false;
+    
+        if ($user->save()) {
+            return response()->json([
+                'status_code' => $statusCode,
+                'status_message' => $statusMessage,
+                'data' => $user,
+            ]);
+        } else {
+            return response()->json([
+                'status_code' => 500,
+                'status_message' => 'Erreur lors du bloquage du user',
+            ]);
+        }
+    }
+    public function debloquerUser(User $user)
+    {
+        $statusMessage = $user->etat ? 'Le user est déjà debloqué.' : 'L\'utilisateur a été debloqué avec succès';
+        $statusCode = $user->etat ? 200 : 400;
+    
+        $user->etat = true;
+    
+        if ($user->save()) {
+            return response()->json([
+                'status_code' => $statusCode,
+                'status_message' => $statusMessage,
+                'data' => $user,
+            ]);
+        } else {
+            return response()->json([
+                'status_code' => 500,
+                'status_message' => 'Erreur lors du debloquage du user',
+            ]);
+        }
+    }
+        
    
 }

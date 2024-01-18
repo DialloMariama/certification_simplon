@@ -34,6 +34,10 @@ Route::post('logout', [AuthController::class, 'logout']);
 
 Route::middleware('auth:api', 'admin')->group(function () {
     Route::put('updateAdmin', [AuthController::class, 'update']);
+    Route::put('bloquerUser/{user}', [AuthController::class, 'bloquerUser']);
+    Route::put('debloquerUser/{user}', [AuthController::class, 'debloquerUser']);
+
+
     
 });
 

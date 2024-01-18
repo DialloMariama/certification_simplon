@@ -27,7 +27,11 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'role',
     ];
-
+    public function userable()
+    {
+        return $this->morphTo();
+    }
+    
    
     /**
      * The attributes that should be hidden for serialization.
