@@ -28,27 +28,22 @@ Route::post('inscriptionProprietaire', [ProprietaireController::class, 'register
 
 Route::post('logout', [AuthController::class, 'logout']);
 
-// Route::middleware(['auth:api', 'role:admin,etudiant,proprietaire'])->group(function () {
-//     Route::put('update', [AuthController::class, 'update']);
-// });
-
 Route::middleware('auth:api', 'admin')->group(function () {
     Route::put('updateAdmin', [AuthController::class, 'update']);
     Route::put('bloquerUser/{user}', [AuthController::class, 'bloquerUser']);
     Route::put('debloquerUser/{user}', [AuthController::class, 'debloquerUser']);
-
-
-    
+    Route::get('utilisateursBloques', [AuthController::class, 'listeUtilisateursBloques']);
+    Route::get('utilisateurs', [AuthController::class, 'listeUtilisateurs']);
+    Route::get('etudiants', [AuthController::class, 'listeEtudiantsNonBloques']);
+    Route::get('proprietaires', [AuthController::class, 'listeProprietairesNonBloques']);
 });
 
 Route::middleware('auth:api', 'etudiant')->group(function () {
     Route::put('updateEtudiant', [EtudiantController::class, 'updateEtudiant']);
-    
 });
 
 Route::middleware('auth:api', 'proprietaire')->group(function () {
     Route::put('updateProprietaire', [ProprietaireController::class, 'updateProprietaire']);
-    
 });
 
 

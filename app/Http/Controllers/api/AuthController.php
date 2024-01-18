@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\api;
 
 use App\Models\User;
+use App\Models\Etudiant;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Proprietaire;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -77,9 +79,9 @@ class AuthController extends Controller
     {
         $statusMessage = $user->etat ? 'L\'utilisateur a été bloqué avec succès' : 'Le user est déjà bloqué.';
         $statusCode = $user->etat ? 200 : 400;
-    
+
         $user->etat = false;
-    
+
         if ($user->save()) {
             return response()->json([
                 'status_code' => $statusCode,
@@ -97,9 +99,9 @@ class AuthController extends Controller
     {
         $statusMessage = $user->etat ? 'Le user est déjà debloqué.' : 'L\'utilisateur a été debloqué avec succès';
         $statusCode = $user->etat ? 200 : 400;
-    
+
         $user->etat = true;
-    
+
         if ($user->save()) {
             return response()->json([
                 'status_code' => $statusCode,
@@ -113,6 +115,54 @@ class AuthController extends Controller
             ]);
         }
     }
-        
-   
+
+    public function listeUtilisateursBloques()
+    {
+        $utilisateursBloques = User::where('etat', false)->get();
+
+        return response()->json([
+            'status_code' => 200,
+            'status_message' => 'Liste des utilisateurs bloqués récupérée avec succès',
+            'data' => $utilisateursBloques,
+        ]);
+    }
+    public function listeUtilisateurs()
+    {
+        $utilisateurs = User::where('etat', true)->get();
+
+        return response()->json([
+            'status_code' => 200,
+            'status_message' => 'Liste des utilisateurs actifs récupérée avec succès',
+            'data' => $utilisateurs,
+        ]);
+    }
+
+    public function listeEtudiantsNonBloques()
+{
+    $etudiantsNonBloques = Etudiant::with('user:id,nom,prenom,telephone,adresse,email,role')
+        ->whereHas('user', function ($query) {
+            $query->where('etat', true);
+        })->get();
+
+    return response()->json([
+        'status_code' => 200,
+        'status_message' => 'Liste des étudiants non bloqués récupérée avec succès',
+        'data' => $etudiantsNonBloques,
+    ]);
+}
+
+public function listeProprietairesNonBloques()
+{
+    $proprietairesNonBloques = Proprietaire::with('user:id,nom,prenom,telephone,adresse,email,role')
+    ->whereHas('user', function ($query) {
+        $query->where('etat', true);
+    })->get();
+
+    return response()->json([
+        'status_code' => 200,
+        'status_message' => 'Liste des étudiants non bloqués récupérée avec succès',
+        'data' => $proprietairesNonBloques,
+    ]);
+}
+
 }
