@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('localites', function (Blueprint $table) {
             $table->id();
             $table->string('nomLocalite');
-            $table->string('region')->default('Dakar');
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->string('commune')->default('Dakar');
+            $table->unsignedBigInteger('proprietaire_id');
+            $table->foreign('proprietaire_id')->references('id')->on('proprietaires')->onDelete('cascade');
             $table->timestamps();
         });
     }
