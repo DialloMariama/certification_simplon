@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Localite extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'nomLocalite',
+        'commune',
+    ];
+
+    public function users(){
+        return $this->belongsToMany(User::class);
+    }
 }
+

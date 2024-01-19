@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\api\Controllers;
 
 use App\Models\Commentaire;
 use App\Http\Requests\StoreCommentaireRequest;
 use App\Http\Requests\UpdateCommentaireRequest;
+use App\Http\Controllers\Controller;
+
 
 class CommentaireController extends Controller
 {

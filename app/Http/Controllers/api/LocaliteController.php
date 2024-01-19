@@ -1,66 +1,77 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
 use App\Models\Localite;
-use App\Http\Requests\StoreLocaliteRequest;
-use App\Http\Requests\UpdateLocaliteRequest;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class LocaliteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    
     public function index()
     {
-        //
+        return response()->json([
+            'message' => 'Liste de toutes les localités',
+            'localite' => Localite::all()
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    public function store(Request $request)
+{
+    $user = Auth::user();
+    $request->validate([
+        'nomLocalite' => 'required|string|max:255',
+        'commune' => 'required|string|max:255',
+    ]);
+    $localite = Localite::create([
+        'nomLocalite' => $request->nomLocalite,
+        'user_id' => $user->id,
+        'commune' => $request->commune,
+    ]);
+    return response()->json([
+        'message' => 'Localité enregistrée avec succés',
+        'localite' => $localite
+    ]);
+}
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreLocaliteRequest $request)
+    public function update(Request $request, $id)
     {
-        //
-    }
+        $localite = Localite::findOrFail($id);
+        $request->validate([
+            'nomLocalite' => 'required|string|max:255',
+            'commune' => 'required|string|max:255',
+        ]);
+        $localite->nomLocalite = $request->input('nomLocalite');
+        $localite->commune = $request->input('commune');
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Localite $localite)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Localite $localite)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateLocaliteRequest $request, Localite $localite)
-    {
-        //
+        if($localite->update()){
+            return response()->json([
+                'localite'=>$localite,
+                'message'=> 'Localité modifiée',
+            ]);
+        }else{
+            return response()->json([
+                'message'=> 'Localité non modifiée',
+            ],404);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Localite $localite)
+    public function destroy($id)
     {
-        //
+        $localite = Localite::findOrFail($id);
+        if($localite->delete()){
+            return response()->json([
+                'message'=> 'Localité supprimée',
+            ]);
+        }else{
+            return response()->json([
+                'message'=> 'Localité non supprimée',
+            ],404);
+        }
     }
 }

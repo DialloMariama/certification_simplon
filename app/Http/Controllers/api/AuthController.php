@@ -4,9 +4,10 @@ namespace App\Http\Controllers\api;
 
 use App\Models\User;
 use App\Models\Etudiant;
+use App\Models\Localite;
+use App\Models\Proprietaire;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Proprietaire;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -164,5 +165,7 @@ public function listeProprietairesNonBloques()
         'data' => $proprietairesNonBloques,
     ]);
 }
+
+
 
 }

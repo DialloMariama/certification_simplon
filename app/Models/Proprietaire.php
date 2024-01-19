@@ -16,4 +16,8 @@ class Proprietaire extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function Localite(){
+        return $this->belongsToMany(Localite::class);
+    }
 }

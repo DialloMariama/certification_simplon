@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Models\User;
+use App\Models\Localite;
 use App\Models\Proprietaire;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -100,6 +101,7 @@ class ProprietaireController extends Controller
     }
 }
 
+
     /**
      * Display a listing of the resource.
      */
@@ -119,10 +121,10 @@ class ProprietaireController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreProprietaireRequest $request)
-    {
-        //
-    }
+    // public function store(StoreProprietaireRequest $request)
+    // {
+    //     //
+    // }
 
     /**
      * Display the specified resource.
