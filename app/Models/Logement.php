@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Logement extends Model
 {
     use HasFactory;
+
+
+    public function images()
+    {
+        return $this->hasMany(Image::class);
+    }
+    public function proprietaire()
+    {
+        return $this->belongsTo(Proprietaire::class);
+    }
 }

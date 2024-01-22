@@ -33,13 +33,21 @@ class User extends Authenticatable implements JWTSubject
     }
     public function etudiants()
     {
-        return $this->belongsTo(Etudiant::class);
+        return $this->hasMany(Etudiant::class);
     }
     public function proprietaires()
     {
-        return $this->belongsTo(Proprietaire::class);
+        return $this->hasMany(Proprietaire::class);
     }
+    
+    public function Localite()
+    {
+        return $this->hasMany(Localite::class);
+    }
+    // Dans le modèle User
    
+
+
     /**
      * The attributes that should be hidden for serialization.
      *

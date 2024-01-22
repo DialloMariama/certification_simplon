@@ -12,12 +12,13 @@ class Proprietaire extends Model
         'user_id',
     ];
 
-    public function user()
+    public function user() 
     {
         return $this->belongsTo(User::class);
     }
-
-    public function Localite(){
-        return $this->belongsToMany(Localite::class);
+    public function logements()
+    {
+        return $this->hasMany(Logement::class);
     }
+    
 }

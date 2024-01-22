@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Image extends Model
 {
     use HasFactory;
+    public function logement()
+    {
+        return $this->belongsTo(Logement::class);
+    }
 }

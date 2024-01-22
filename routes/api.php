@@ -3,8 +3,10 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\AuthController;
+use App\Http\Controllers\api\ImageController;
 use App\Http\Controllers\api\EtudiantController;
 use App\Http\Controllers\api\LocaliteController;
+use App\Http\Controllers\api\LogementController;
 use App\Http\Controllers\api\ProprietaireController;
 
 /*
@@ -17,6 +19,8 @@ use App\Http\Controllers\api\ProprietaireController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::get('logements', [LogementController::class, 'index']);
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
@@ -41,16 +45,27 @@ Route::middleware('auth:api', 'admin')->group(function () {
     Route::get('localites', [LocaliteController::class, 'index']);
     Route::put('localites/{id}', [LocaliteController::class, 'update']);
     Route::delete('localites/{id}', [LocaliteController::class, 'destroy']);
+    Route::get('logementsAdmin', [LogementController::class, 'index']);
 });
 
 Route::middleware('auth:api', 'etudiant')->group(function () {
     Route::put('updateEtudiant', [EtudiantController::class, 'updateEtudiant']);
+    Route::get('detailLogement/{id}', [LogementController::class, 'show']);
 });
 
 Route::middleware('auth:api', 'proprietaire')->group(function () {
     Route::put('updateProprietaire', [ProprietaireController::class, 'updateProprietaire']);
-});
+    Route::post('ajoutLogements', [LogementController::class, 'store']);
+    Route::put('logements/{id}', [LogementController::class, 'update']);
+    Route::delete('logements/{id}', [LogementController::class, 'destroy']);
+    Route::get('detailLogement/{id}', [LogementController::class, 'show']);
+    Route::get('logementsProprietaire', [ProprietaireController::class, 'index']);
+    Route::post('ajoutImage/{logementId}', [LogementController::class, 'addImage']);
+    Route::delete('deleteImage/{logementId}/{imageId}', [LogementController::class, 'deleteImage']);
 
+
+    Route::put('/logements/{id}/images',[ImageController::class, 'updateImages']);
+});
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Models\User;
 use App\Models\Etudiant;
 use App\Models\Localite;
+use App\Models\Logement;
 use App\Models\Proprietaire;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -166,6 +167,16 @@ public function listeProprietairesNonBloques()
     ]);
 }
 
-
+public function index()
+    {
+        try {
+            $logements = Logement::with('images')->get();
+            return response()->json([
+                "logements" => $logements,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(["message" => "Une erreur s'est produite"], 500);
+        }
+    }
 
 }
