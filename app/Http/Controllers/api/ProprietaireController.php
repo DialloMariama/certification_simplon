@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Models\User;
 use App\Models\Localite;
+use App\Models\Logement;
 use App\Models\Proprietaire;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\StoreProprietaireRequest;
 use App\Http\Requests\UpdateProprietaireRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 
 class ProprietaireController extends Controller
@@ -101,11 +103,33 @@ class ProprietaireController extends Controller
     }
 }
 
+public function index()
+{
+    try {
+        
+        $user = Auth::user()->proprietaires()->first();
+        // dd(Auth::user()->proprietaires()->get());
+        // dd($user->id);
+
+        $logements = Logement::with('images')->where('proprietaire_id', $user->id)->get();
+
+        return response()->json([
+            "logements" => $logements,
+        ]);
+
+    } catch (ModelNotFoundException $e) {
+        return response()->json(["message" => "Logements non trouvés"], 404);
+    } catch (\Exception $e) {
+        return response()->json(["message" => "Une erreur s'est produite"], 500);
+    }
+}
+
+
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index1()
     {
         //
     }
