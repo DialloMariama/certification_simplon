@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\AnnonceController;
 use App\Http\Controllers\api\CommentaireController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,8 @@ use App\Http\Controllers\api\ProprietaireController;
 */
 
 Route::get('logements', [LogementController::class, 'index']);
+Route::get('annonces', [AnnonceController::class, 'index']);
+
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
@@ -48,6 +51,7 @@ Route::middleware('auth:api', 'admin')->group(function () {
     Route::delete('localites/{id}', [LocaliteController::class, 'destroy']);
     Route::get('logementsAdmin', [LogementController::class, 'index']);
     Route::delete('commentaires/{id}', [CommentaireController::class, 'destroy']);
+    Route::get('annonces', [AnnonceController::class, 'index']);
 
 });
 
@@ -57,6 +61,13 @@ Route::middleware('auth:api', 'etudiant')->group(function () {
     Route::post('ajoutCommentaire', [CommentaireController::class, 'store']);
     Route::put('commentaires/{commentaire}', [CommentaireController::class, 'update']);
     Route::delete('commentaires/{id}', [CommentaireController::class, 'destroy']);
+    Route::post('ajoutAnnonce', [AnnonceController::class, 'store']);
+    Route::put('annonces/{annonce}', [AnnonceController::class, 'update']);
+    Route::get('annonces', [AnnonceController::class, 'index']);
+    Route::delete('annonces/{id}', [AnnonceController::class, 'destroy']);
+    Route::get('detailAnnonce/{id}', [AnnonceController::class, 'show']); 
+    Route::put('marquerPrisEncharge/{id}', [AnnonceController::class, 'marquerPriseEnCharge']); 
+
 
 });
 
