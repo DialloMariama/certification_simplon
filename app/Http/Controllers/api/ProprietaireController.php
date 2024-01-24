@@ -15,6 +15,12 @@ use App\Http\Requests\StoreProprietaireRequest;
 use App\Http\Requests\UpdateProprietaireRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+/**
+ * @OA\Tag(
+ *      name="Proprietaires",
+ *     description="Points de terminaison API pour la gestion des proprietaires"
+ * )
+ */
 
 class ProprietaireController extends Controller
 {

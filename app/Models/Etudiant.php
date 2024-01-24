@@ -19,4 +19,12 @@ class Etudiant extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function commentaires()
+    {
+        return $this->hasMany(Commentaire::class);
+    }
+    public function annonces()
+    {
+        return $this->hasMany(Annonce::class);
+    }
 }

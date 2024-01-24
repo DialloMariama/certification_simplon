@@ -18,4 +18,8 @@ class Logement extends Model
     {
         return $this->belongsTo(Proprietaire::class);
     }
+    public function commentaires()
+    {
+        return $this->hasMany(Commentaire::class);
+    }
 }

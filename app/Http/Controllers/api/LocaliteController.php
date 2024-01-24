@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @OA\Tag(
+ *      name="Localites",
+ *     description="Points de terminaison API pour la gestion des localités"
+ * )
+ */
 class LocaliteController extends Controller
 {
     
