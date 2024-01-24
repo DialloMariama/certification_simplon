@@ -11,7 +11,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreImageRequest;
 use App\Http\Requests\UpdateImageRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-
+/**
+ * @OA\Tag(
+ *      name="Images",
+ *     description="Points de terminaison API pour la gestion des images"
+ * )
+ */
 class ImageController extends Controller
 {
     /**
@@ -128,33 +133,33 @@ class ImageController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function deleteImage($logementId, $imageId)
-    {
-        try {
-            $logement = Logement::findOrFail($logementId);
-            $user = Auth::user();
+    // public function deleteImage($logementId, $imageId)
+    // {
+    //     try {
+    //         $logement = Logement::findOrFail($logementId);
+    //         $user = Auth::user();
     
-            // Vérifiez si l'utilisateur est le propriétaire du logement
-            if ($user->proprietaire->id != $logement->proprietaire_id) {
-                return response()->json(['error' => 'Vous n\'avez pas la permission de supprimer cette image.'], 403);
-            }
+    //         // Vérifiez si l'utilisateur est le propriétaire du logement
+    //         if ($user->proprietaire->id != $logement->proprietaire_id) {
+    //             return response()->json(['error' => 'Vous n\'avez pas la permission de supprimer cette image.'], 403);
+    //         }
     
-            $image = Image::findOrFail($imageId);
+    //         $image = Image::findOrFail($imageId);
     
-            // Supprimer l'image du stockage
-            Storage::disk('public')->delete($image->nomImage);
+    //         // Supprimer l'image du stockage
+    //         Storage::disk('public')->delete($image->nomImage);
     
-            // Supprimer l'entrée de la base de données
-            $image->delete();
+    //         // Supprimer l'entrée de la base de données
+    //         $image->delete();
     
-            return response()->json([
-                "message" => "Image supprimée avec succès",
-            ]);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(["message" => "Logement ou image non trouvé"], 404);
-        } catch (\Exception $e) {
-            return response()->json(["message" => "Une erreur s'est produite"], 500);
-        }
-    }
+    //         return response()->json([
+    //             "message" => "Image supprimée avec succès",
+    //         ]);
+    //     } catch (ModelNotFoundException $e) {
+    //         return response()->json(["message" => "Logement ou image non trouvé"], 404);
+    //     } catch (\Exception $e) {
+    //         return response()->json(["message" => "Une erreur s'est produite"], 500);
+    //     }
+    // }
     
 }

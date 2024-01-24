@@ -10,7 +10,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-
+/**
+ * @OA\Tag(
+ *      name="Etudiants",
+ *     description="Points de terminaison API pour la gestion des Etudiants"
+ * )
+ */
 class EtudiantController extends Controller
 {
 

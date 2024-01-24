@@ -4,7 +4,6 @@ namespace App\Http\Controllers\api;
 
 use App\Models\User;
 use App\Models\Etudiant;
-use App\Models\Localite;
 use App\Models\Logement;
 use App\Models\Proprietaire;
 use Illuminate\Http\Request;
@@ -12,6 +11,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * @OA\Tag(
+ *      name="Authentification",
+ *     description="Points de terminaison API pour l'authentification ,l'inscription affichage des informations, la deconnexion et raffrechissement des tokens des utilisateurs"
+ * )
+ */
 class AuthController extends Controller
 {
     public function __construct()

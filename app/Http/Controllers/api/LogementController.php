@@ -5,7 +5,6 @@ namespace App\Http\Controllers\api;
 use App\Models\Image;
 
 
-use App\Models\Localite;
 use App\Models\Logement;
 use App\Models\Proprietaire;
 use Illuminate\Http\Request;
@@ -15,6 +14,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+/**
+ * @OA\Tag(
+ *      name="Logements",
+ *     description="Points de terminaison API pour la gestion des logements et images"
+ * )
+ */
 class LogementController extends Controller
 {
     /**
@@ -23,7 +28,7 @@ class LogementController extends Controller
     public function index()
     {
         try {
-            $logement = Logement::with(['images' => function ($query) {
+            $logement = Logement::with(['commentaires','images' => function ($query) {
                 $query->first();
             }])->get();
 

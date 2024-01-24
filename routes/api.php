@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\CommentaireController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\AuthController;
@@ -46,11 +47,17 @@ Route::middleware('auth:api', 'admin')->group(function () {
     Route::put('localites/{id}', [LocaliteController::class, 'update']);
     Route::delete('localites/{id}', [LocaliteController::class, 'destroy']);
     Route::get('logementsAdmin', [LogementController::class, 'index']);
+    Route::delete('commentaires/{id}', [CommentaireController::class, 'destroy']);
+
 });
 
 Route::middleware('auth:api', 'etudiant')->group(function () {
     Route::put('updateEtudiant', [EtudiantController::class, 'updateEtudiant']);
     Route::get('detailLogement/{id}', [LogementController::class, 'show']);
+    Route::post('ajoutCommentaire', [CommentaireController::class, 'store']);
+    Route::put('commentaires/{commentaire}', [CommentaireController::class, 'update']);
+    Route::delete('commentaires/{id}', [CommentaireController::class, 'destroy']);
+
 });
 
 Route::middleware('auth:api', 'proprietaire')->group(function () {
@@ -58,13 +65,11 @@ Route::middleware('auth:api', 'proprietaire')->group(function () {
     Route::post('ajoutLogements', [LogementController::class, 'store']);
     Route::put('logements/{id}', [LogementController::class, 'update']);
     Route::delete('logements/{id}', [LogementController::class, 'destroy']);
-    Route::get('detailLogement/{id}', [LogementController::class, 'show']);
+    Route::get('detailLogement/{id}', [LogementController::class, 'show']); 
     Route::get('logementsProprietaire', [ProprietaireController::class, 'index']);
     Route::post('ajoutImage/{logementId}', [LogementController::class, 'addImage']);
     Route::delete('deleteImage/{logementId}/{imageId}', [LogementController::class, 'deleteImage']);
 
-
-    Route::put('/logements/{id}/images',[ImageController::class, 'updateImages']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
