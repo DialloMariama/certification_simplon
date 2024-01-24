@@ -116,12 +116,12 @@ class CommentaireController extends Controller
     {
         $user = Auth::user();
         $etudiant = Etudiant::where('user_id', $user->id)->first();
-        $logement = $etudiant->commentaires()->find($id);
+        $commentaire = $etudiant->commentaires()->find($id);
 
-        if (!$logement) {
+        if (!$commentaire) {
             return response()->json(['error' => 'Vous n\'avez pas la permission de supprimer ce commentaire.'], 403);
         }
-        if ($logement->delete()) {
+        if ($commentaire->delete()) {
             return response()->json([
                 'message' => 'Commentaire supprimé',
             ]);

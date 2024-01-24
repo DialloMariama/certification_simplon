@@ -16,7 +16,7 @@ return new class extends Migration
             $table->text('description');
             $table->float('budget');
             $table->string('caracteristiques');
-            $table->boolean('prisEnCharge')->default(true);
+            $table->boolean('prisEnCharge')->default(false);
             $table->unsignedBigInteger('etudiant_id');
             $table->foreign('etudiant_id')->references('id')->on('etudiants')->onDelete('cascade');
             $table->timestamps();

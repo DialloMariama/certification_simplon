@@ -13,6 +13,8 @@ class Annonce extends Model
         'etudiant_id',
         'description',
         'budget',
+        'caracteristiques',
+        'prisEnCharge',
     ];
     public function etudiant()
     {
