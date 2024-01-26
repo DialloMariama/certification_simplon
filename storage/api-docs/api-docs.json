@@ -1,5 +1,2786 @@
 {
     "openapi": "3.0.0",
+    "paths": {
+        "/api/annonces": {
+            "get": {
+                "tags": [
+                    "Annonces"
+                ],
+                "summary": "Liste de toutes les annonces",
+                "description": "Récupère la liste de toutes les annonces non encore prises en charge.",
+                "operationId": "getAnnonces",
+                "responses": {
+                    "200": {
+                        "description": "Liste des annonces récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Liste de toutes les annonces"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Annonce"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ajoutAnnonce": {
+            "post": {
+                "tags": [
+                    "Annonces"
+                ],
+                "summary": "Créer une nouvelle annonce",
+                "description": "Permet à un étudiant de créer une nouvelle annonce.",
+                "operationId": "createAnnonce",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Description de l'annonce"
+                                    },
+                                    "budget": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1000
+                                    },
+                                    "caracteristiques": {
+                                        "type": "string",
+                                        "example": "Caractéristiques de l'annonce"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Annonce créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Annonce créée avec succès"
+                                        },
+                                        "annonce": {
+                                            "$ref": "#/components/schemas/Annonce"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation a échoué",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Les données de la requête sont invalides."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "description": [
+                                                    "Le champ description est requis."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/detailAnnonce/{id}": {
+            "get": {
+                "tags": [
+                    "Annonces"
+                ],
+                "summary": "Obtenir une annonce par son identifiant",
+                "description": "Récupère une annonce spécifique en utilisant son identifiant.",
+                "operationId": "getAnnonceById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'annonce",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Annonce récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "Annonce": {
+                                            "$ref": "#/components/schemas/Annonce"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Annonce non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Annonce non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/annonces/{annonce}": {
+            "put": {
+                "tags": [
+                    "Annonces"
+                ],
+                "summary": "Mettre à jour une annonce",
+                "description": "Met à jour une annonce spécifique en utilisant son identifiant.",
+                "operationId": "updateAnnonce",
+                "parameters": [
+                    {
+                        "name": "annonce",
+                        "in": "path",
+                        "description": "Objet de l'annonce à mettre à jour",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/Annonce"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "budget": {
+                                        "type": "number"
+                                    },
+                                    "caracteristiques": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Annonce mise à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Annonce mise à jour avec succès"
+                                        },
+                                        "annonce": {
+                                            "$ref": "#/components/schemas/Annonce"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Vous n'avez pas la permission de mettre à jour cette annonce",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Vous n'avez pas la permission de mettre à jour cette annonce"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite lors de la mise à jour de l'annonce",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite lors de la mise à jour de l'annonce"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/annonces/{id}": {
+            "delete": {
+                "tags": [
+                    "Annonces"
+                ],
+                "summary": "Supprimer une annonce",
+                "description": "Supprime une annonce spécifique en utilisant son identifiant.",
+                "operationId": "deleteAnnonce",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant de l'annonce à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Annonce supprimée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Annonce supprimée"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Vous n'avez pas la permission de supprimer cette annonce",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Vous n'avez pas la permission de supprimer cette annonce"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Annonce non supprimée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Annonce non supprimée"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/marquerPrisEncharge/{id}": {
+            "put": {
+                "tags": [
+                    "Annonces"
+                ],
+                "summary": "Marquer une annonce comme prise en charge",
+                "description": "Marque une annonce spécifique comme prise en charge par un étudiant.",
+                "operationId": "marquerPriseEnCharge",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant de l'annonce à marquer comme prise en charge",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Annonce marquée comme prise en charge avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Annonce marquée comme prise en charge avec succès"
+                                        },
+                                        "annonce": {
+                                            "$ref": "#/components/schemas/Annonce"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Vous n'avez pas la permission de marquer cette annonce",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Vous n'avez pas la permission de marquer cette annonce"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Annonce non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Annonce non trouvée"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Connecter un utilisateur existant",
+                "description": "Connectez-vous avec un e-mail et un mot de passe pour obtenir un jeton d'authentification",
+                "operationId": "dcf90ce65219b0ad51fc32e9f7f69843",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "utilisateur@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "motdepasse"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "description": "Détails de l'utilisateur",
+                                            "type": "object"
+                                        },
+                                        "authorization": {
+                                            "description": "Détails d'autorisation",
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    }
+                }
+            }
+        },
+        "/api/user": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Afficher les informations de l'utilisateur connecté",
+                "operationId": "40dae923bbcb1e7f55e11bb971e17aaa",
+                "responses": {
+                    "200": {
+                        "description": "Détails de l'utilisateur connecté",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Déconnexion d'un utilisateur",
+                "operationId": "2a5c5c6e21dd0583f5d700d2f707f03f",
+                "responses": {
+                    "200": {
+                        "description": "Déconnexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/refresh": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Actualiser le jeton d'authentification",
+                "operationId": "86401e84cc22f61f7b8a66405f646794",
+                "responses": {
+                    "200": {
+                        "description": "Jeton d'authentification actualisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/utilisateursBloques": {
+            "get": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Liste des utilisateurs bloqués",
+                "description": "Récupère la liste des utilisateurs bloqués dans le système.",
+                "operationId": "listeUtilisateursBloques",
+                "responses": {
+                    "200": {
+                        "description": "Liste des utilisateurs bloqués récupérée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "status_message": {
+                                            "type": "string",
+                                            "example": "Liste des utilisateurs bloqués récupérée avec succès."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "example": []
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/utilisateurs": {
+            "get": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Liste des utilisateurs actifs",
+                "description": "Récupère la liste des utilisateurs actifs dans le système.",
+                "operationId": "listeUtilisateurs",
+                "responses": {
+                    "200": {
+                        "description": "Liste des utilisateurs actifs récupérée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "status_message": {
+                                            "type": "string",
+                                            "example": "Liste des utilisateurs actifs récupérée avec succès."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "example": []
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/etudiants": {
+            "get": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Liste des étudiants non bloqués",
+                "description": "Récupère la liste des étudiants non bloqués dans le système.",
+                "operationId": "listeEtudiantsNonBloques",
+                "responses": {
+                    "200": {
+                        "description": "Liste des étudiants non bloqués récupérée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "status_message": {
+                                            "type": "string",
+                                            "example": "Liste des étudiants non bloqués récupérée avec succès."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "example": []
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/proprietaires": {
+            "get": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Liste des propriétaires non bloqués",
+                "description": "Récupère la liste des propriétaires non bloqués dans le système.",
+                "operationId": "listeProprietairesNonBloques",
+                "responses": {
+                    "200": {
+                        "description": "Liste des propriétaires non bloqués récupérée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "status_message": {
+                                            "type": "string",
+                                            "example": "Liste des propriétaires non bloqués récupérée avec succès."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "example": []
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/logementsAdmin": {
+            "get": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Liste des logements pour un admin",
+                "description": "Récupère la liste des logements avec leurs images associées pour un admin.",
+                "operationId": "index",
+                "responses": {
+                    "200": {
+                        "description": "Liste des logements récupérée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "logements": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/LogementWithImages"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/ajoutCommentaire": {
+            "post": {
+                "tags": [
+                    "Commentaires"
+                ],
+                "summary": "Créer un commentaire pour un logement",
+                "description": "Crée un nouveau commentaire pour un logement donné.",
+                "operationId": "createCommentaire",
+                "requestBody": {
+                    "description": "Données du commentaire",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "texte",
+                                    "logement_id"
+                                ],
+                                "properties": {
+                                    "texte": {
+                                        "type": "string"
+                                    },
+                                    "logement_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Commentaire créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Commentaire créé avec succès"
+                                        },
+                                        "commentaire": {
+                                            "type": "object"
+                                        },
+                                        "logement": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Logement non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logement non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The given data was invalid."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/commentaires/{commentaire}": {
+            "put": {
+                "tags": [
+                    "Commentaires"
+                ],
+                "summary": "Mettre à jour un commentaire",
+                "description": "Met à jour un commentaire existant pour un étudiant authentifié.",
+                "operationId": "updateCommentaire",
+                "parameters": [
+                    {
+                        "name": "commentaire",
+                        "in": "path",
+                        "description": "ID du commentaire à mettre à jour",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Nouvelles données du commentaire",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "texte"
+                                ],
+                                "properties": {
+                                    "texte": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Commentaire mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Commentaire mis à jour avec succès"
+                                        },
+                                        "commentaire": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permission refusée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Vous n'avez pas la permission de mettre à jour ce commentaire."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Commentaire non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Commentaire non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite lors de la mise à jour du commentaire",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite lors de la mise à jour du commentaire"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/commentaires/{id}": {
+            "delete": {
+                "tags": [
+                    "Commentaires"
+                ],
+                "summary": "Supprimer un commentaire",
+                "description": "Supprime un commentaire pour un étudiant authentifié.",
+                "operationId": "deleteCommentaire",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du commentaire à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Commentaire supprimé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Commentaire supprimé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permission refusée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Vous n'avez pas la permission de supprimer ce commentaire."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Commentaire non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Commentaire non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/registerEtudiant": {
+            "post": {
+                "tags": [
+                    "Etudiants"
+                ],
+                "summary": "Enregistrer un nouveau etudiant",
+                "operationId": "c109242387402c3f6d657680e4f3efe8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom",
+                                    "adresse",
+                                    "telephone",
+                                    "email",
+                                    "password",
+                                    "paysOrigine",
+                                    "universite",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string"
+                                    },
+                                    "prenom": {
+                                        "type": "string"
+                                    },
+                                    "telephone": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "paysOrigine": {
+                                        "type": "string"
+                                    },
+                                    "universite": {
+                                        "type": "string"
+                                    },
+                                    "role": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/updateEtudiant": {
+            "put": {
+                "tags": [
+                    "Etudiants"
+                ],
+                "summary": "Mise à jour des informations de l'étudiant",
+                "description": "Permet à l'étudiant de mettre à jour ses informations personnelles.",
+                "operationId": "updateEtudiant",
+                "requestBody": {
+                    "description": "Données à mettre à jour",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "Nom"
+                                    },
+                                    "prenom": {
+                                        "type": "string",
+                                        "example": "Prénom"
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "Adresse"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "etudiant@example.com"
+                                    },
+                                    "telephone": {
+                                        "type": "string",
+                                        "example": "+2217700000"
+                                    },
+                                    "paysOrigine": {
+                                        "type": "string",
+                                        "example": "Pays d'origine"
+                                    },
+                                    "universite": {
+                                        "type": "string",
+                                        "example": "Nom de l'université"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "nouveauMotDePasse"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Informations mises à jour avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Informations mises à jour avec succès"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Étudiant non trouvé.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Étudiant non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/forget-password": {
+            "post": {
+                "tags": [
+                    "Mot de passe oublié"
+                ],
+                "summary": "Soumettre le mail de récupération de mot de passe",
+                "description": "Soumet le formulaire de récupération de mot de passe en envoyant un email avec un lien de réinitialisation.",
+                "operationId": "submitForgetPasswordForm",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Email de récupération envoyé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Nous vous avons envoyé un email de récupération!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Données invalides!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ajoutImage/{id}": {
+            "post": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Ajouter une image à un logement",
+                "description": "Ajoute une image à un logement spécifié par l'ID.",
+                "operationId": "addImage",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du logement",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Données de l'image",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "image": {
+                                        "description": "Fichier image à téléverser",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Image ajoutée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Image ajoutée avec succès"
+                                        },
+                                        "image": {
+                                            "$ref": "#/components/schemas/Image"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permission refusée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Vous n'avez pas la permission d'ajouter une image à ce logement."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Logement non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logement non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/supprimerImmage/{logementId}/{imageId}": {
+            "delete": {
+                "tags": [
+                    "Images"
+                ],
+                "summary": "Supprimer une image d'un logement",
+                "description": "Supprime une image spécifiée par l'ID d'un logement spécifié par l'ID.",
+                "operationId": "deleteImage",
+                "parameters": [
+                    {
+                        "name": "logementId",
+                        "in": "path",
+                        "description": "ID du logement",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "imageId",
+                        "in": "path",
+                        "description": "ID de l'image",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image supprimée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Image supprimée avec succès"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Permission refusée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Vous n'avez pas la permission de supprimer cette image."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Logement ou image non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logement ou image non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/localites": {
+            "get": {
+                "tags": [
+                    "Localites"
+                ],
+                "summary": "Obtenir la liste de toutes les localités",
+                "description": "Retourne la liste de toutes les localités enregistrées.",
+                "operationId": "getLocalites",
+                "responses": {
+                    "200": {
+                        "description": "Liste de toutes les localités",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Liste de toutes les localités"
+                                        },
+                                        "localite": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Localite"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Non autorisé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Localites"
+                ],
+                "summary": "Enregistrer une nouvelle localité",
+                "description": "Enregistre une nouvelle localité associée à l'utilisateur authentifié.",
+                "operationId": "createLocalite",
+                "requestBody": {
+                    "description": "Contenu de la requête",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nomLocalite": {
+                                        "type": "string",
+                                        "example": "Nom de la localité"
+                                    },
+                                    "commune": {
+                                        "type": "string",
+                                        "example": "Nom de la commune"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Localité enregistrée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Localité enregistrée avec succès"
+                                        },
+                                        "localite": {
+                                            "$ref": "#/components/schemas/Localite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Non autorisé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur de validation"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/localites/{id}": {
+            "put": {
+                "tags": [
+                    "Localites"
+                ],
+                "summary": "Modifier une localité existante",
+                "description": "Modifie une localité existante associée à l'utilisateur authentifié.",
+                "operationId": "updateLocalite",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la localité à modifier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Contenu de la requête",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nomLocalite": {
+                                        "type": "string",
+                                        "example": "Nouveau nom de la localité"
+                                    },
+                                    "commune": {
+                                        "type": "string",
+                                        "example": "Nouveau nom de la commune"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Localité modifiée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Localité modifiée avec succès"
+                                        },
+                                        "localite": {
+                                            "$ref": "#/components/schemas/Localite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Non autorisé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Localité non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Localité non trouvée"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur de validation"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Localites"
+                ],
+                "summary": "Supprimer une localité existante",
+                "description": "Supprime une localité existante associée à l'utilisateur authentifié.",
+                "operationId": "deleteLocalite",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la localité à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Localité supprimée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Localité supprimée avec succès"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Non autorisé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Localité non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Localité non trouvée"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/logements": {
+            "get": {
+                "tags": [
+                    "Logements"
+                ],
+                "summary": "Récupérer la liste de tous les logements",
+                "description": "Récupère la liste de tous les logements avec leurs commentaires et une seule image associée à chaque logement.",
+                "operationId": "getAllLogements",
+                "responses": {
+                    "200": {
+                        "description": "Liste de tous les logements récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Liste de tous les logements récupérée avec succès"
+                                        },
+                                        "logement": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/LogementWithCommentairesAndImage"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Logement non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logement non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ajoutLogements": {
+            "post": {
+                "tags": [
+                    "Logements"
+                ],
+                "summary": "Créer un nouveau logement",
+                "description": "Crée un nouveau logement avec les détails fournis.",
+                "operationId": "createLogement",
+                "requestBody": {
+                    "description": "Données du logement",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "adresse",
+                                    "type",
+                                    "disponibilite",
+                                    "description",
+                                    "superficie",
+                                    "prix",
+                                    "equipements",
+                                    "localite_id",
+                                    "image"
+                                ],
+                                "properties": {
+                                    "adresse": {
+                                        "description": "Adresse du logement",
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "description": "Type de logement",
+                                        "type": "string"
+                                    },
+                                    "disponibilite": {
+                                        "description": "Date de disponibilité du logement",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "description": {
+                                        "description": "Description du logement",
+                                        "type": "string"
+                                    },
+                                    "superficie": {
+                                        "description": "Superficie du logement",
+                                        "type": "numeric"
+                                    },
+                                    "prix": {
+                                        "description": "Prix du logement",
+                                        "type": "numeric"
+                                    },
+                                    "nombreChambre": {
+                                        "description": "Nombre de chambres du logement",
+                                        "type": "integer",
+                                        "minimum": 1
+                                    },
+                                    "equipements": {
+                                        "description": "Équipements du logement",
+                                        "type": "string"
+                                    },
+                                    "localite_id": {
+                                        "description": "ID de la localité associée",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "image": {
+                                        "description": "Tableau d'images du logement",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "file",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Logement enregistré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logement enregistré avec succès"
+                                        },
+                                        "logement": {
+                                            "$ref": "#/components/schemas/Logement"
+                                        },
+                                        "images": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Image"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "adresse": [
+                                                    "Le champ adresse est obligatoire."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/detailLogement/{id}": {
+            "get": {
+                "tags": [
+                    "Logements"
+                ],
+                "summary": "Récupérer un logement par ID",
+                "description": "Récupère les détails d'un logement en fonction de l'ID fourni.",
+                "operationId": "getLogementById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du logement à récupérer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Logement récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "logement": {
+                                            "$ref": "#/components/schemas/Logement"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Logement non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logement non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/logements/{id}": {
+            "put": {
+                "tags": [
+                    "Logements"
+                ],
+                "summary": "Mettre à jour un logement",
+                "description": "Met à jour les détails d'un logement en fonction de l'ID fourni.",
+                "operationId": "updateLogement",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du logement à mettre à jour",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "adresse": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "disponibilite": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "description": {
+                                        "type": "string"
+                                    },
+                                    "superficie": {
+                                        "type": "number"
+                                    },
+                                    "prix": {
+                                        "type": "number"
+                                    },
+                                    "nombreChambre": {
+                                        "type": "integer"
+                                    },
+                                    "equipements": {
+                                        "type": "string"
+                                    },
+                                    "localite_id": {
+                                        "type": "integer"
+                                    },
+                                    "remplacer_images": {
+                                        "type": "boolean"
+                                    },
+                                    "image": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Logement mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logement mis à jour avec succès"
+                                        },
+                                        "logement": {
+                                            "$ref": "#/components/schemas/Logement"
+                                        },
+                                        "images": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Image"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Logement non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logement non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "adresse": [
+                                                    "Le champ adresse est obligatoire."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Vous n'avez pas la permission de modifier ce logement",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Vous n'avez pas la permission de modifier ce logement."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Logements"
+                ],
+                "summary": "Supprimer un logement",
+                "description": "Supprime un logement en fonction de l'ID fourni.",
+                "operationId": "deleteLogement",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du logement à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Logement supprimé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logement supprimé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Vous n'avez pas la permission de supprimer ce logement",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Vous n'avez pas la permission de supprimer ce logement."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Logement non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logement non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/whatsapp.proprietaire/{id}": {
+            "get": {
+                "tags": [
+                    "WhatsApp"
+                ],
+                "summary": "Rediriger vers WhatsApp",
+                "description": "Redirige vers l'application WhatsApp avec le numéro de téléphone du propriétaire.",
+                "operationId": "redirigerWhatsApp",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du propriétaire",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirection vers WhatsApp",
+                        "headers": {
+                            "Location": {
+                                "description": "URL de redirection",
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Propriétaire non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Propriétaire non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/registerProprietaire": {
+            "post": {
+                "tags": [
+                    "Propriétaires"
+                ],
+                "summary": "Enregistrer un nouveau proprietaire",
+                "operationId": "3f7dc66a7e80721199612c3f3a1d0d78",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom",
+                                    "adresse",
+                                    "telephone",
+                                    "email",
+                                    "password",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string"
+                                    },
+                                    "prenom": {
+                                        "type": "string"
+                                    },
+                                    "telephone": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "role": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/updateProprietaire": {
+            "put": {
+                "tags": [
+                    "Propriétaires"
+                ],
+                "summary": "Mise à jour des informations du propriétaire",
+                "description": "Permet au propriétaire de mettre à jour ses informations personnelles.",
+                "operationId": "updateProprietaire",
+                "requestBody": {
+                    "description": "Données à mettre à jour",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "Nom"
+                                    },
+                                    "prenom": {
+                                        "type": "string",
+                                        "example": "Prénom"
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "Adresse"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "proprietaire@example.com"
+                                    },
+                                    "telephone": {
+                                        "type": "string",
+                                        "example": "+1234567890"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "nouveauMotDePasse"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Informations mises à jour avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Informations mises à jour avec succès"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Propriétaire non trouvé.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Propriétaire non trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/logementsProprietaire": {
+            "get": {
+                "tags": [
+                    "Propriétaires"
+                ],
+                "summary": "Obtenir la liste des logements d'un propriétaire",
+                "description": "Récupère la liste des logements associés à un propriétaire.",
+                "operationId": "getProprietaireLogements",
+                "responses": {
+                    "200": {
+                        "description": "Liste des logements récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "logements": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Logements non trouvés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logements non trouvés"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
     "components": {
         "securitySchemes": {
             "bearerAuth": {
@@ -11,8 +2792,12 @@
     },
     "tags": [
         {
+            "name": "Annonces",
+            "description": "Points de terminaison API pour la gestion des annonces"
+        },
+        {
             "name": "Authentification",
-            "description": "Points de terminaison API pour l'authentification ,l'inscription affichage des informations, la deconnexion et raffrechissement des tokens des utilisateurs"
+            "description": "Points de terminaison API pour l'authentification ,affichage des informations, la deconnexion et raffrechissement des tokens des utilisateurs, bloquer et debloquer etudiant et proprietaire"
         },
         {
             "name": "Commentaires",
@@ -21,6 +2806,10 @@
         {
             "name": "Etudiants",
             "description": "Points de terminaison API pour la gestion des Etudiants"
+        },
+        {
+            "name": "Mot de passe oublié",
+            "description": "Points de terminaison API pour la gestion Mot de passe oublié "
         },
         {
             "name": "Images",
@@ -35,7 +2824,7 @@
             "description": "Points de terminaison API pour la gestion des logements et images"
         },
         {
-            "name": "Proprietaires",
+            "name": "Propriétaires",
             "description": "Points de terminaison API pour la gestion des proprietaires"
         }
     ]

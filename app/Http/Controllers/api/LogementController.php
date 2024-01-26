@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\api;
 
+use Exception;
+
+
+use App\Models\User;
 use App\Models\Image;
-
-
 use App\Models\Logement;
 use App\Models\Proprietaire;
 use Illuminate\Http\Request;
@@ -25,10 +27,42 @@ class LogementController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    /**
+     * @OA\Get(
+     *      path="/api/logements",
+     *      operationId="getAllLogements",
+     *      tags={"Logements"},
+     *      summary="Récupérer la liste de tous les logements",
+     *      description="Récupère la liste de tous les logements avec leurs commentaires et une seule image associée à chaque logement.",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Liste de tous les logements récupérée avec succès",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Liste de tous les logements récupérée avec succès"),
+     *              @OA\Property(property="logement", type="array", @OA\Items(ref="#/components/schemas/LogementWithCommentairesAndImage")),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Logement non trouvé",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Logement non trouvé"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erreur interne du serveur",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Une erreur s'est produite"),
+     *          ),
+     *      ),
+     * )
+     */
     public function index()
     {
         try {
-            $logement = Logement::with(['commentaires','images' => function ($query) {
+            $logement = Logement::with(['commentaires', 'images' => function ($query) {
                 $query->first();
             }])->get();
 
@@ -53,6 +87,53 @@ class LogementController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     */
+
+    /**
+     * @OA\Post(
+     *      path="/api/ajoutLogements",
+     *      operationId="createLogement",
+     *      tags={"Logements"},
+     *      summary="Créer un nouveau logement",
+     *      description="Crée un nouveau logement avec les détails fournis.",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Données du logement",
+     *          @OA\JsonContent(
+     *              required={"adresse", "type", "disponibilite", "description", "superficie", "prix", "equipements", "localite_id", "image"},
+     *              @OA\Property(property="adresse", type="string", description="Adresse du logement"),
+     *              @OA\Property(property="type", type="string", description="Type de logement"),
+     *              @OA\Property(property="disponibilite", type="date", description="Date de disponibilité du logement"),
+     *              @OA\Property(property="description", type="string", description="Description du logement"),
+     *              @OA\Property(property="superficie", type="numeric", description="Superficie du logement"),
+     *              @OA\Property(property="prix", type="numeric", description="Prix du logement"),
+     *              @OA\Property(property="nombreChambre", type="integer", description="Nombre de chambres du logement", minimum=1),
+     *              @OA\Property(property="equipements", type="string", description="Équipements du logement"),
+     *              @OA\Property(property="localite_id", type="integer", description="ID de la localité associée", example=1),
+     *              @OA\Property(property="image", type="array", description="Tableau d'images du logement",
+     *                  @OA\Items(type="file", format="binary")
+     *              ),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Logement enregistré avec succès",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Logement enregistré avec succès"),
+     *              @OA\Property(property="logement", ref="#/components/schemas/Logement"),
+     *              @OA\Property(property="images", type="array", @OA\Items(ref="#/components/schemas/Image")),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Erreur de validation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="errors", type="object", example={"adresse": {"Le champ adresse est obligatoire."}})
+     *          ),
+     *      ),
+     *      security={{"bearerAuth": {}}},
+     * 
+     * )
      */
     public function store(Request $request)
     {
@@ -115,6 +196,46 @@ class LogementController extends Controller
     /**
      * Display the specified resource.
      */
+
+    /**
+     * @OA\Get(
+     *      path="/api/detailLogement/{id}",
+     *      operationId="getLogementById",
+     *      tags={"Logements"},
+     *      summary="Récupérer un logement par ID",
+     *      description="Récupère les détails d'un logement en fonction de l'ID fourni.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="ID du logement à récupérer",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer", format="int64"),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Logement récupéré avec succès",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="logement", ref="#/components/schemas/Logement"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Logement non trouvé",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Logement non trouvé"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Une erreur s'est produite",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Une erreur s'est produite"),
+     *          ),
+     *      ),
+     *      security={{"bearerAuth": {}}},
+     * 
+     * )
+     */
     public function show($id)
     {
         try {
@@ -143,6 +264,81 @@ class LogementController extends Controller
 
     /**
      * Update the specified resource in storage.
+     */
+
+    /**
+     * @OA\Put(
+     *      path="/api/logements/{id}",
+     *      operationId="updateLogement",
+     *      tags={"Logements"},
+     *      summary="Mettre à jour un logement",
+     *      description="Met à jour les détails d'un logement en fonction de l'ID fourni.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="ID du logement à mettre à jour",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer", format="int64"),
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\MediaType(
+     *              mediaType="application/json",
+     *              @OA\Schema(
+     *                  @OA\Property(property="adresse", type="string"),
+     *                  @OA\Property(property="type", type="string"),
+     *                  @OA\Property(property="disponibilite", type="string", format="date"),
+     *                  @OA\Property(property="description", type="string"),
+     *                  @OA\Property(property="superficie", type="number"),
+     *                  @OA\Property(property="prix", type="number"),
+     *                  @OA\Property(property="nombreChambre", type="integer"),
+     *                  @OA\Property(property="equipements", type="string"),
+     *                  @OA\Property(property="localite_id", type="integer"),
+     *                  @OA\Property(property="remplacer_images", type="boolean"),
+     *                  @OA\Property(property="image", type="array", @OA\Items(type="string", format="binary")),
+     *              ),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Logement mis à jour avec succès",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Logement mis à jour avec succès"),
+     *              @OA\Property(property="logement", ref="#/components/schemas/Logement"),
+     *              @OA\Property(property="images", type="array", @OA\Items(ref="#/components/schemas/Image")),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Logement non trouvé",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Logement non trouvé"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Erreur de validation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="errors", type="object", example={"adresse": {"Le champ adresse est obligatoire."}}),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Vous n'avez pas la permission de modifier ce logement",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="error", type="string", example="Vous n'avez pas la permission de modifier ce logement."),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Une erreur s'est produite",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Une erreur s'est produite"),
+     *          ),
+     *      ),
+     *      security={{"bearerAuth": {}}},
+     * 
+     * )
      */
     public function update(Request $request, $id)
     {
@@ -215,6 +411,47 @@ class LogementController extends Controller
     /**
      * Remove the specified resource from storage.
      */
+
+    /**
+     * @OA\Delete(
+     *      path="/api/logements/{id}",
+     *      operationId="deleteLogement",
+     *      tags={"Logements"},
+     *      summary="Supprimer un logement",
+     *      description="Supprime un logement en fonction de l'ID fourni.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="ID du logement à supprimer",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer", format="int64"),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Logement supprimé",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Logement supprimé"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Vous n'avez pas la permission de supprimer ce logement",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="error", type="string", example="Vous n'avez pas la permission de supprimer ce logement."),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Logement non trouvé",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Logement non trouvé"),
+     *          ),
+     *      ),
+     *      security={{"bearerAuth": {}}},
+     * 
+     * )
+     */
+
     public function destroy($id)
     {
         $user = Auth::user();
@@ -235,75 +472,69 @@ class LogementController extends Controller
         }
     }
 
-    public function addImage(Request $request, $logementId)
+
+    /**
+     * @OA\Get(
+     *      path="/api/whatsapp.proprietaire/{id}",
+     *      operationId="redirigerWhatsApp",
+     *      tags={"WhatsApp"},
+     *      summary="Rediriger vers WhatsApp",
+     *      description="Redirige vers l'application WhatsApp avec le numéro de téléphone du propriétaire.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="ID du propriétaire",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer", format="int64"),
+     *      ),
+     *      @OA\Response(
+     *          response=302,
+     *          description="Redirection vers WhatsApp",
+     *          @OA\Header(header="Location", description="URL de redirection", @OA\Schema(type="string")),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Propriétaire non trouvé",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Propriétaire non trouvé"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erreur interne du serveur",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="error", type="string", example="Une erreur s'est produite"),
+     *          ),
+     *      ),
+     *      security={{"bearerAuth": {}}},
+     * 
+     * )
+     */
+
+    public function redirigerWhatsApp($id)
+
     {
         try {
-            $logement = Logement::findOrFail($logementId);
-            $user = Auth::user()->proprietaires()->first();
-    
-      
-            if ($user->id != $logement->proprietaire_id) {
-                return response()->json(['error' => 'Vous n\'avez pas la permission d\'ajouter une image à ce logement.'], 403);
+            if (!is_numeric($id)) {
+                throw new Exception('L\'ID doit être numérique.');
             }
-        
-            $request->validate([
-                'image.*' => 'required|file',
-            ]);
-            $imagesData = [];
 
-    
-            if ($request->file('image')) {
-                foreach ($request->file('image') as $file) {
-                    $image = new Image();
-                    $imagePath = $file->store('images/logement', 'public');
-                    $image->nomImage = $imagePath;
-                    $image->logement_id = $logement->id;
-                    $image->save();
-            $imagesData =  $image;
+            $proprietaire = User::findOrFail($id);
 
-                }
+            $numeroOriginal = $proprietaire->telephone;
+            $numeroWhatsApp = preg_replace('/[^0-9]/', '', $numeroOriginal);
+
+            if (empty($numeroWhatsApp)) {
+                throw new Exception("Numéro de téléphone non valide. Numéro original : $numeroOriginal, Numéro nettoyé : $numeroWhatsApp");
             }
-    
-            return response()->json([
-                "message" => "Image ajoutée avec succès",
-                "image" =>$imagesData,
-            ]);
+
+            $urlWhatsApp = "https://api.whatsapp.com/send?phone=$numeroWhatsApp";
+
+            return redirect()->to($urlWhatsApp);
         } catch (ModelNotFoundException $e) {
-            return response()->json(["message" => "Logement non trouvé"], 404);
-        } catch (\Exception $e) {
-            return response()->json(["message" => "Une erreur s'est produite"], 500);
+            return redirect()->route('whatsapp.proprietaire');
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
-    public function deleteImage($logementId, $imageId)
-    {
-        try {
-            $logement = Logement::findOrFail($logementId);
-            $user = Auth::user()->proprietaires()->first();
-    
-      
-            if ($user->id != $logement->proprietaire_id) {
-                return response()->json(['error' => 'Vous n\'avez pas la permission d\'ajouter une image à ce logement.'], 403);
-            }
-    
-            $image = Image::findOrFail($imageId);
-    
-            // Supprimer l'image du stockage
-            Storage::disk('public')->delete($image->nomImage);
-    
-            // Supprimer l'entrée de la base de données
-            $image->delete();
-    
-            return response()->json([
-                "message" => "Image supprimée avec succès",
-            ]);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(["message" => "Logement ou image non trouvé"], 404);
-        } catch (\Exception $e) {
-            return response()->json(["message" => "Une erreur s'est produite"], 500);
-        }
-    }
-
-  
-
 }
