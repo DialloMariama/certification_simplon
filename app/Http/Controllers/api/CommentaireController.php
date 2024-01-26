@@ -39,6 +39,59 @@ class CommentaireController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+    /**
+     * @OA\Post(
+     *      path="/api/ajoutCommentaire",
+     *      operationId="createCommentaire",
+     *      tags={"Commentaires"},
+     *      summary="Créer un commentaire pour un logement",
+     *      description="Crée un nouveau commentaire pour un logement donné.",
+     *      security={{"bearerAuth": {}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Données du commentaire",
+     *          @OA\JsonContent(
+     *              required={"texte", "logement_id"},
+     *              @OA\Property(property="texte", type="string"),
+     *              @OA\Property(property="logement_id", type="integer"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Commentaire créé avec succès",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Commentaire créé avec succès"),
+     *              @OA\Property(property="commentaire", type="object"),
+     *              @OA\Property(property="logement", type="object"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Logement non trouvé",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Logement non trouvé"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation failed",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="The given data was invalid."),
+     *              @OA\Property(property="errors", type="object"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Une erreur s'est produite",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Une erreur s'est produite"),
+     *          ),
+     *      ),
+     *      security={{"bearerAuth": {}}},
+     * 
+     * )
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -82,6 +135,64 @@ class CommentaireController extends Controller
      * Update the specified resource in storage.
      */
 
+    /**
+     * @OA\Put(
+     *      path="/api/commentaires/{commentaire}",
+     *      operationId="updateCommentaire",
+     *      tags={"Commentaires"},
+     *      summary="Mettre à jour un commentaire",
+     *      description="Met à jour un commentaire existant pour un étudiant authentifié.",
+     *      security={{"bearerAuth": {}}},
+     *      @OA\Parameter(
+     *          name="commentaire",
+     *          description="ID du commentaire à mettre à jour",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer",
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          description="Nouvelles données du commentaire",
+     *          @OA\JsonContent(
+     *              required={"texte"},
+     *              @OA\Property(property="texte", type="string"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Commentaire mis à jour avec succès",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Commentaire mis à jour avec succès"),
+     *              @OA\Property(property="commentaire", type="object"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Permission refusée",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="error", type="string", example="Vous n'avez pas la permission de mettre à jour ce commentaire."),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Commentaire non trouvé",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Commentaire non trouvé"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Une erreur s'est produite lors de la mise à jour du commentaire",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Une erreur s'est produite lors de la mise à jour du commentaire"),
+     *          ),
+     *      ),
+     *      security={{"bearerAuth": {}}},
+     * 
+     * )
+     */
 
     public function update(Request $request, Commentaire $commentaire)
     {
@@ -112,6 +223,48 @@ class CommentaireController extends Controller
      * Remove the specified resource from storage.
      */
 
+    /**
+     * @OA\Delete(
+     *      path="/api/commentaires/{id}",
+     *      operationId="deleteCommentaire",
+     *      tags={"Commentaires"},
+     *      summary="Supprimer un commentaire",
+     *      description="Supprime un commentaire pour un étudiant authentifié.",
+     *      security={{"bearerAuth": {}}},
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="ID du commentaire à supprimer",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer",
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Commentaire supprimé avec succès",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Commentaire supprimé"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Permission refusée",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="error", type="string", example="Vous n'avez pas la permission de supprimer ce commentaire."),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Commentaire non trouvé",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Commentaire non trouvé"),
+     *          ),
+     *      ),
+     *      security={{"bearerAuth": {}}},
+     * 
+     * )
+     */
     public function destroy($id)
     {
         $user = Auth::user();

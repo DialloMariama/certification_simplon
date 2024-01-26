@@ -1,15 +1,16 @@
 <?php
 
-use App\Http\Controllers\api\AnnonceController;
-use App\Http\Controllers\api\CommentaireController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\ImageController;
+use App\Http\Controllers\api\AnnonceController;
 use App\Http\Controllers\api\EtudiantController;
 use App\Http\Controllers\api\LocaliteController;
 use App\Http\Controllers\api\LogementController;
+use App\Http\Controllers\api\CommentaireController;
 use App\Http\Controllers\api\ProprietaireController;
+use App\Http\Controllers\api\ForgotPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,9 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('refresh', 'refresh');
     Route::post('user', 'userInformation');
 });
+Route::post('forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post'); 
+Route::get('reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
+Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
 
 Route::post('inscriptionEtudiant', [EtudiantController::class, 'registerEtudiant']);
 Route::post('inscriptionProprietaire', [ProprietaireController::class, 'registerProprietaire']);
@@ -52,12 +56,11 @@ Route::middleware('auth:api', 'admin')->group(function () {
     Route::get('logementsAdmin', [LogementController::class, 'index']);
     Route::delete('commentaires/{id}', [CommentaireController::class, 'destroy']);
     Route::get('annonces', [AnnonceController::class, 'index']);
-
+    Route::post('whatsapp.proprietaire/{id}', [LogementController::class, 'redirigerWhatsApp']);
 });
 
 Route::middleware('auth:api', 'etudiant')->group(function () {
     Route::put('updateEtudiant', [EtudiantController::class, 'updateEtudiant']);
-    Route::get('detailLogement/{id}', [LogementController::class, 'show']);
     Route::post('ajoutCommentaire', [CommentaireController::class, 'store']);
     Route::put('commentaires/{commentaire}', [CommentaireController::class, 'update']);
     Route::delete('commentaires/{id}', [CommentaireController::class, 'destroy']);
@@ -65,10 +68,10 @@ Route::middleware('auth:api', 'etudiant')->group(function () {
     Route::put('annonces/{annonce}', [AnnonceController::class, 'update']);
     Route::get('annonces', [AnnonceController::class, 'index']);
     Route::delete('annonces/{id}', [AnnonceController::class, 'destroy']);
-    Route::get('detailAnnonce/{id}', [AnnonceController::class, 'show']); 
-    Route::put('marquerPrisEncharge/{id}', [AnnonceController::class, 'marquerPriseEnCharge']); 
-
-
+    Route::get('detailAnnonce/{id}', [AnnonceController::class, 'show']);
+    Route::put('marquerPrisEncharge/{id}', [AnnonceController::class, 'marquerPriseEnCharge']);
+    Route::post('whatsapp.proprietaire/{id}', [LogementController::class, 'redirigerWhatsApp']);
+    Route::get('detailLogement/{id}', [LogementController::class, 'show']);
 });
 
 Route::middleware('auth:api', 'proprietaire')->group(function () {
@@ -76,11 +79,11 @@ Route::middleware('auth:api', 'proprietaire')->group(function () {
     Route::post('ajoutLogements', [LogementController::class, 'store']);
     Route::put('logements/{id}', [LogementController::class, 'update']);
     Route::delete('logements/{id}', [LogementController::class, 'destroy']);
-    Route::get('detailLogement/{id}', [LogementController::class, 'show']); 
     Route::get('logementsProprietaire', [ProprietaireController::class, 'index']);
-    Route::post('ajoutImage/{logementId}', [LogementController::class, 'addImage']);
-    Route::delete('deleteImage/{logementId}/{imageId}', [LogementController::class, 'deleteImage']);
-
+    Route::post('ajoutImage/{id}', [ImageController::class, 'addImage']);
+    Route::delete('supprimerImmage/{logementId}/{imageId}', [ImageController::class, 'deleteImage']);
+    Route::post('whatsapp.proprietaire/{id}', [LogementController::class, 'redirigerWhatsApp']);
+    Route::get('detailLogement/{id}', [LogementController::class, 'show']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
