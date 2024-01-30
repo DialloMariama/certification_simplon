@@ -22,4 +22,9 @@ class Logement extends Model
     {
         return $this->hasMany(Commentaire::class);
     }
+
+    public function localite()
+    {
+        return $this->belongsTo(Localite::class);
+    }
 }

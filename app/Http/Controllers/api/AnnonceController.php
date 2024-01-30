@@ -9,8 +9,6 @@ use App\Models\Etudiant;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\StoreAnnonceRequest;
-use App\Http\Requests\UpdateAnnonceRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
@@ -398,8 +396,6 @@ class AnnonceController extends Controller
             $user = Auth::user();
             $etudiant = Etudiant::where('user_id', $user->id)->first();
             $annonce = $etudiant->annonces()->findOrFail($id);
-            // $annonce->pr
-
             $annonce->update([
                 'prisEnCharge' => true,
             ]);
@@ -412,6 +408,69 @@ class AnnonceController extends Controller
             return response()->json(["error" => "Vous n'avez pas la permission de marquer cette annonce."], 403);
         } catch (\Exception $e) {
             return response()->json(["message" => "Une erreur s'est produite"], 500);
+        }
+    }
+
+
+ /**
+ * @OA\Delete(
+ *      path="/api/supprimerAnnonces/{id}",
+ *      operationId="deleteAnnonce",
+ *      tags={"Annonces"},
+ *      summary="Supprimer une annonce par un admin",
+ *      description="Supprime une annonce en fonction de l'ID fourni.",
+ *      @OA\Parameter(
+ *          name="id",
+ *          description="ID de l'annonce à supprimer",
+ *          required=true,
+ *          in="path",
+ *          @OA\Schema(type="integer", format="int64"),
+ *      ),
+ *      @OA\Response(
+ *          response=200,
+ *          description="Annonce supprimée",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="Annonce supprimée"),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=403,
+ *          description="Vous n'avez pas la permission de supprimer cette annonce",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="error", type="string", example="Vous n'avez pas la permission de supprimer cette annonce."),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=404,
+ *          description="Annonce non trouvée",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="error", type="string", example="Annonce non trouvée"),
+ *          ),
+ *      ),
+ *      security={{"bearerAuth": {}}},
+ * )
+ */
+    public function destroyByAdmin($id)
+    {
+        try {
+            // Vérifier si l'utilisateur actuel est un administrateur
+            if (!Auth::user()->isAdmin()) {
+                return response()->json(['error' => 'Vous n\'avez pas la permission de supprimer cette annonce.'], 403);
+            }
+
+            $annonce = Annonce::find($id);
+
+            if (!$annonce) {
+                return response()->json(['error' => 'annonce non trouvée'], 404);
+            }
+
+            $annonce->delete();
+
+            return response()->json([
+                'message' => 'Annonce supprimée par l\'administrateur',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Une erreur s\'est produite'], 500);
         }
     }
 }

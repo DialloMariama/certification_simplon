@@ -15,8 +15,13 @@ class Localite extends Model
         'commune',
     ];
 
-    public function users(){
+    public function users()
+    {
         return $this->belongsToMany(User::class);
     }
-}
 
+    public function logements()
+    {
+        return $this->hasMany(Logement::class);
+    }
+}

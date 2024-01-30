@@ -45,7 +45,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Localite::class);
     }
-    // Dans le modèle User
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+    
    
 
 

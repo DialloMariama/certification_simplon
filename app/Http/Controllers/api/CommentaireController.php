@@ -284,30 +284,68 @@ class CommentaireController extends Controller
             ], 404);
         }
     }
-    // public function destroy($id)
-    // {
-    //     $user = Auth::user();
-    //     $etudiant = Etudiant::where('user_id', $user->id)->first();
+  
 
-    //     $commentaire = Commentaire::find($id);
+    /**
+ * @OA\Delete(
+ *      path="/api/supprimerCommentaires/{id}",
+ *      operationId="deleteCommentaire",
+ *      tags={"Commentaires"},
+ *      summary="Supprimer un commentaire par un admin",
+ *      description="Supprime un commentaire en fonction de l'ID fourni.",
+ *      @OA\Parameter(
+ *          name="id",
+ *          description="ID du commentaire à supprimer",
+ *          required=true,
+ *          in="path",
+ *          @OA\Schema(type="integer", format="int64"),
+ *      ),
+ *      @OA\Response(
+ *          response=200,
+ *          description="Commentaire supprimé",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="Commentaire supprimé"),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=403,
+ *          description="Vous n'avez pas la permission de supprimer ce commentaire",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="error", type="string", example="Vous n'avez pas la permission de supprimer ce commentaire."),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=404,
+ *          description="Commentaire non trouvé",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="error", type="string", example="Commentaire non trouvé"),
+ *          ),
+ *      ),
+ *      security={{"bearerAuth": {}}},
+ * )
+ */
+    public function destroyByAdmin($id)
+    {
+        try {
+            // Vérifier si l'utilisateur actuel est un administrateur
+            if (!Auth::user()->isAdmin()) {
+                return response()->json(['error' => 'Vous n\'avez pas la permission de supprimer ce commentaire.'], 403);
+            }
 
-    //     if (!$commentaire) {
-    //         return response()->json(['error' => 'Le commentaire spécifié n\'existe pas.'], 404);
-    //     }
+            $commentaire = Commentaire::find($id);
 
-    //     // Vérifiez si l'utilisateur est administrateur
-    //     if ($user->hasRole('admin') || ($etudiant && $commentaire->etudiant_id === $etudiant->id)) {
-    //         if ($commentaire->delete()) {
-    //             return response()->json([
-    //                 'message' => 'Commentaire supprimé',
-    //             ]);
-    //         } else {
-    //             return response()->json([
-    //                 'message' => 'Une erreur s\'est produite lors de la suppression du commentaire',
-    //             ], 500);
-    //         }
-    //     } else {
-    //         return response()->json(['error' => 'Vous n\'avez pas la permission de supprimer ce commentaire.'], 403);
-    //     }
-    // }
+            if (!$commentaire) {
+                return response()->json(['error' => 'Commentaire non trouvé'], 404);
+            }
+
+            $commentaire->delete();
+
+            return response()->json([
+                'message' => 'Commentaire supprimé par l\'administrateur',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Une erreur s\'est produite'], 500);
+        }
+    }
+
 }

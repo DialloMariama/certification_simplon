@@ -11,6 +11,7 @@ use App\Models\Logement;
 use App\Models\Proprietaire;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Localite;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -512,7 +513,6 @@ class LogementController extends Controller
      */
 
     public function redirigerWhatsApp($id)
-
     {
         try {
             if (!is_numeric($id)) {
@@ -535,6 +535,76 @@ class LogementController extends Controller
             return redirect()->route('whatsapp.proprietaire');
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+    /**
+ * @OA\Get(
+ *      path="/api/logement-par-localite/{localite}",
+ *      operationId="logementParLocalite",
+ *      tags={"Logement"},
+ *      summary="Obtenir les logements par localité",
+ *      description="Renvoie les logements associés à une localité spécifiée.",
+ *      @OA\Parameter(
+ *          name="localite",
+ *          description="Instance de la classe Localite.",
+ *          required=true,
+ *          in="path",
+ *          @OA\Schema(type="integer", format="int64"),
+ *      ),
+ *      @OA\Response(
+ *          response=200,
+ *          description="Logements trouvés",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="statut", type="string", example="OK"),
+ *              @OA\Property(property="logements", type="array", @OA\Items(ref="#/components/schemas/Logement")),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=404,
+ *          description="Localité non trouvée",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="statut", type="string", example="Erreur"),
+ *              @OA\Property(property="message", type="string", example="Localité non trouvée"),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=500,
+ *          description="Erreur interne du serveur",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="statut", type="string", example="Erreur"),
+ *              @OA\Property(property="message", type="string", example="Une erreur s'est produite"),
+ *          ),
+ *      ),
+ *      @OA\SecurityRequirement(
+ *          bearerAuth={},
+ *      ),
+ * )
+ */
+    public function logementParLocalite(Localite $localite)
+    {
+        try {
+
+            if ($localite) {
+                $logements = $localite->logements;
+
+                return response()->json([
+                    'statut' => 'OK',
+                    'logements' => $logements,
+                ]);
+            } else {
+                return response()->json([
+                    'statut' => 'Erreur',
+                    'message' => 'Localité non trouvée',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            // Capturez les exceptions pour éviter des erreurs non gérées.
+            return response()->json([
+                'statut' => 'Erreur',
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 }

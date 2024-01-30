@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('nomLocalite');
             $table->string('commune')->default('Dakar');
-            $table->unsignedBigInteger('proprietaire_id');
-            $table->foreign('proprietaire_id')->references('id')->on('proprietaires')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
