@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\StoreProprietaireRequest;
 use App\Http\Requests\UpdateProprietaireRequest;
@@ -26,7 +27,7 @@ class ProprietaireController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/registerProprietaire",
+     *     path="/api/inscriptionProprietaire",
      *     summary="Enregistrer un nouveau proprietaire",
      *     tags={"Propriétaires"},
      *     @OA\RequestBody(
@@ -54,15 +55,22 @@ class ProprietaireController extends Controller
     public function registerProprietaire(Request $request)
     {
         try {
-            $request->validate([
+
+            $validate = Validator::make($request->all(), [
                 'nom' => 'required|string|max:255',
                 'prenom' => 'required|string|max:255',
                 'adresse' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:6',
-                'telephone' => 'required|numeric|regex:/^\+[0-9]+$/|max:14',
+                'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|max:14',
                 'role' => 'required|string|in:proprietaire',
             ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'error' => $validate->errors()
+                ]);
+            }
+
 
             $user = new User();
             $proprietaire = new Proprietaire();
@@ -80,7 +88,7 @@ class ProprietaireController extends Controller
 
             if ($proprietaire->save()) {
                 return response()->json([
-                    "message" => "Etudiant enregistré avec success",
+                    "message" => "Propriétaire enregistré avec succés",
                     "proprietaire" => array_merge(array($proprietaire), array($user))
                 ]);
             } else {
@@ -143,14 +151,18 @@ class ProprietaireController extends Controller
         try {
             $user = Auth::user();
 
-            $request->validate([
+            $validate = Validator::make($request->all(), [
                 'nom' => 'required|string|max:255',
                 'prenom' => 'required|string|max:255',
                 'adresse' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-                'telephone' => 'nullable|numeric|regex:/^\+[0-9]+$/|max:14',
+                'telephone' => 'nullable|string|regex:/^\+[0-9]+$/|unique:users|max:14',
             ]);
-
+            if ($validate->fails()) {
+                return response()->json([
+                    'error' => $validate->errors()
+                ]);
+            }
             $user = User::findOrFail($user->id);
             $proprietaire = Proprietaire::where('user_id', $user->id)->first();
             if (!$proprietaire) {
@@ -219,9 +231,6 @@ class ProprietaireController extends Controller
         try {
 
             $user = Auth::user()->proprietaires()->first();
-            // dd(Auth::user()->proprietaires()->get());
-            // dd($user->id);
-
             $logements = Logement::with('images')->where('proprietaire_id', $user->id)->get();
 
             return response()->json([
@@ -234,61 +243,4 @@ class ProprietaireController extends Controller
         }
     }
 
-
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index1()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function store(StoreProprietaireRequest $request)
-    // {
-    //     //
-    // }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Proprietaire $proprietaire)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Proprietaire $proprietaire)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateProprietaireRequest $request, Proprietaire $proprietaire)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Proprietaire $proprietaire)
-    {
-        //
-    }
 }

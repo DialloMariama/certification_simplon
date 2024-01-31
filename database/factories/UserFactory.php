@@ -26,10 +26,10 @@ class UserFactory extends Factory
         return [
             'nom' => ('Mariama'),
             'prenom' => ('DIALLO'),
-            'telephone' => ('774958199'),
-            'role' => ('admin'),
+            'telephone' => ('774958197'),
+            'role' => ('etudiant'),
             'adresse' => ('Médina'),
-            'email' => ('maridiallo@gmail.com'),
+            'email' => ('maridiallo12@gmail.com'),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),

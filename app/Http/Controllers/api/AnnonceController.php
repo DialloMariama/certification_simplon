@@ -9,6 +9,7 @@ use App\Models\Etudiant;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
@@ -108,11 +109,16 @@ class AnnonceController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+       $validate= Validator::make($request->all(),[
             'description' => 'required|string',
             'budget' => 'required|numeric',
             'caracteristiques' => 'required|string',
         ]);
+        if($validate->fails()){
+            return response()->json([
+                'error' => $validate->errors()
+            ]);
+        }
 
         $etudiant = Etudiant::where('user_id', Auth::user()->id)->first();
         $annonce = new Annonce();
@@ -250,11 +256,16 @@ class AnnonceController extends Controller
     public function update(Request $request, Annonce $annonce)
     {
         try {
-            $request->validate([
+            $validate= Validator::make($request->all(),[
                 'description' => 'required|string',
                 'budget' => 'required|numeric',
                 'caracteristiques' => 'required|string',
             ]);
+            if($validate->fails()){
+                return response()->json([
+                    'error' => $validate->errors()
+                ]);
+            }
             $etudiant = Etudiant::where('user_id', Auth::user()->id)->first();
 
             if ($etudiant && $etudiant->id === $annonce->etudiant_id) {
@@ -453,7 +464,6 @@ class AnnonceController extends Controller
     public function destroyByAdmin($id)
     {
         try {
-            // Vérifier si l'utilisateur actuel est un administrateur
             if (!Auth::user()->isAdmin()) {
                 return response()->json(['error' => 'Vous n\'avez pas la permission de supprimer cette annonce.'], 403);
             }

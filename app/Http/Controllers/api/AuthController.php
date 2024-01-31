@@ -119,7 +119,8 @@ class AuthController extends Controller
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string")
      *         )
-     *     )
+     *     ),
+     * security={{"bearerAuth": {}}},
      * )
      */
     public function logout()

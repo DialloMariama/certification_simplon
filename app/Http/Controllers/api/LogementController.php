@@ -7,13 +7,14 @@ use Exception;
 
 use App\Models\User;
 use App\Models\Image;
+use App\Models\Localite;
 use App\Models\Logement;
 use App\Models\Proprietaire;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Localite;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -139,7 +140,7 @@ class LogementController extends Controller
     public function store(Request $request)
     {
         try {
-            $request->validate([
+            $validate= Validator::make($request->all(),[
                 'adresse' => 'required|string|max:255',
                 'type' => 'required|string|max:255',
                 'disponibilite' => 'required|date',
@@ -151,8 +152,14 @@ class LogementController extends Controller
                 'localite_id' => 'required|exists:localites,id',
                 'image.*' => 'required|file',
             ]);
+            if($validate->fails()){
+                return response()->json([
+                    'error' => $validate->errors()
+                ]);
+            }
 
             $proprietaire = Proprietaire::where('user_id', Auth::user()->id)->first();
+            
 
             $logements = new Logement();
 
@@ -356,7 +363,8 @@ class LogementController extends Controller
             if ($request->has('remplacer_images') && $request->remplacer_images) {
                 $logement->images()->delete();
             }
-            $request->validate([
+         
+            $validate= Validator::make($request->all(),[
                 'adresse' => 'required|string|max:255',
                 'type' => 'required|string|max:255',
                 'disponibilite' => 'required|date',
@@ -368,6 +376,11 @@ class LogementController extends Controller
                 'localite_id' => 'required|exists:localites,id',
                 'image.*' => 'nullable|file',
             ]);
+            if($validate->fails()){
+                return response()->json([
+                    'error' => $validate->errors()
+                ]);
+            }
 
             $logement->adresse = $request->input('adresse');
             $logement->type = $request->input('type');

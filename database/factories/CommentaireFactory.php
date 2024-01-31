@@ -17,7 +17,8 @@ class CommentaireFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'texte' => 'studio',
+            'logement_id' => 8,
         ];
     }
 }

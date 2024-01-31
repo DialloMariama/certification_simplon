@@ -17,7 +17,9 @@ class AnnonceFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'caracteristiques' => 'studio',
+            'budget' => 15000,
+            'description' => '2 chambres',
         ];
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Localite;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * @OA\Tag(
@@ -54,7 +55,7 @@ class LocaliteController extends Controller
 
     /**
      * @OA\Post(
-     *      path="/api/localites",
+     *      path="/api/ajoutLocalites",
      *      operationId="createLocalite",
      *      tags={"Localites"},
      *      summary="Enregistrer une nouvelle localité",
@@ -100,10 +101,16 @@ class LocaliteController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $request->validate([
+
+        $validate= Validator::make($request->all(),[
             'nomLocalite' => 'required|string|max:255',
             'commune' => 'required|string|max:255',
         ]);
+        if($validate->fails()){
+            return response()->json([
+                'error' => $validate->errors()
+            ]);
+        }
         $localite = Localite::create([
             'nomLocalite' => $request->nomLocalite,
             'user_id' => $user->id,
@@ -175,10 +182,16 @@ class LocaliteController extends Controller
     public function update(Request $request, $id)
     {
         $localite = Localite::findOrFail($id);
-        $request->validate([
+  
+        $validate= Validator::make($request->all(),[
             'nomLocalite' => 'required|string|max:255',
             'commune' => 'required|string|max:255',
         ]);
+        if($validate->fails()){
+            return response()->json([
+                'error' => $validate->errors()
+            ]);
+        }
         $localite->nomLocalite = $request->input('nomLocalite');
         $localite->commune = $request->input('commune');
 

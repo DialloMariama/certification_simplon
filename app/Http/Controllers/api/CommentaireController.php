@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\api;
 
 
+use App\Models\Etudiant;
 use App\Models\Logement;
 use App\Models\Commentaire;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreCommentaireRequest;
 use App\Http\Requests\UpdateCommentaireRequest;
-use App\Models\Etudiant;
 
 /**
  * @OA\Tag(
@@ -94,10 +95,16 @@ class CommentaireController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validate= Validator::make($request->all(),[
             'texte' => 'required|string',
             'logement_id' => 'required|numeric',
         ]);
+        if($validate->fails()){
+            return response()->json([
+                'error' => $validate->errors()
+            ]);
+        }
+    
         $etudiant = Etudiant::where('user_id', Auth::user()->id)->first();
         $commentaire = new Commentaire();
         $commentaire->texte = $request->input('texte');
@@ -197,9 +204,14 @@ class CommentaireController extends Controller
     public function update(Request $request, Commentaire $commentaire)
     {
         try {
-            $request->validate([
-                'texte' => 'required|string',
+            $validate= Validator::make($request->all(),[
+            'texte' => 'required|string',
+        ]);
+        if($validate->fails()){
+            return response()->json([
+                'error' => $validate->errors()
             ]);
+        }
             $etudiant = Etudiant::where('user_id', Auth::user()->id)->first();
 
             if ($etudiant && $etudiant->id === $commentaire->etudiant_id) {

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreImageRequest;
 use App\Http\Requests\UpdateImageRequest;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
@@ -105,10 +106,15 @@ class ImageController extends Controller
             if ($user->id != $logement->proprietaire_id) {
                 return response()->json(['error' => 'Vous n\'avez pas la permission d\'ajouter une image à ce logement.'], 403);
             }
-
-            $request->validate([
+            $validate= Validator::make($request->all(),[
                 'image.*' => 'required|file',
+
             ]);
+            if($validate->fails()){
+                return response()->json([
+                    'error' => $validate->errors()
+                ]);
+            }
             $imagesData = [];
 
 
@@ -165,7 +171,7 @@ class ImageController extends Controller
     {
         try {
             $user = Auth::user();
-            dd(Auth::user());
+            // dd(Auth::user());
 
             $logement = Logement::where('id', $logementId)
                 ->where('proprietaire_id', $user->proprietaire->id)
@@ -175,11 +181,16 @@ class ImageController extends Controller
                 $logement->images()->delete();
             }
 
-            $request->validate([
-                'image.*' => 'nullable|file',
-            ]);
+            $validate= Validator::make($request->all(),[
+                'image.*' => 'required|file',
 
-            // Ajouter les nouvelles images
+            ]);
+            if($validate->fails()){
+                return response()->json([
+                    'error' => $validate->errors()
+                ]);
+            }
+
             foreach ($request->file('image') as $file) {
                 $image = new Image();
                 $imagePath = $file->store('images/logement', 'public');

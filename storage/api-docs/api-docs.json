@@ -662,7 +662,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/refresh": {
@@ -1298,13 +1303,13 @@
                 ]
             }
         },
-        "/api/registerEtudiant": {
+        "/api/inscriptionEtudiant": {
             "post": {
                 "tags": [
                     "Etudiants"
                 ],
                 "summary": "Enregistrer un nouveau etudiant",
-                "operationId": "c109242387402c3f6d657680e4f3efe8",
+                "operationId": "a31e112dc3237b63ee39b74163427f40",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1341,6 +1346,9 @@
                                         "type": "string"
                                     },
                                     "universite": {
+                                        "type": "string"
+                                    },
+                                    "adresse": {
                                         "type": "string"
                                     },
                                     "role": {
@@ -1818,7 +1826,9 @@
                         "bearerAuth": []
                     }
                 ]
-            },
+            }
+        },
+        "/api/ajoutLocalites": {
             "post": {
                 "tags": [
                     "Localites"
@@ -2697,13 +2707,13 @@
                 ]
             }
         },
-        "/api/registerProprietaire": {
+        "/api/inscriptionProprietaire": {
             "post": {
                 "tags": [
                     "Propriétaires"
                 ],
                 "summary": "Enregistrer un nouveau proprietaire",
-                "operationId": "3f7dc66a7e80721199612c3f3a1d0d78",
+                "operationId": "a9fc7f4f52b935922a32a0feafe8a433",
                 "requestBody": {
                     "required": true,
                     "content": {

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -20,7 +21,7 @@ class EtudiantController extends Controller
 {
     /**
      * @OA\Post(
-     *     path="/api/registerEtudiant",
+     *     path="/api/inscriptionEtudiant",
      *     summary="Enregistrer un nouveau etudiant",
      *     tags={"Etudiants"},
      *     @OA\RequestBody(
@@ -34,6 +35,7 @@ class EtudiantController extends Controller
      *             @OA\Property(property="password", type="string"),
      *             @OA\Property(property="paysOrigine", type="string"),
      *             @OA\Property(property="universite", type="string"),
+     *             @OA\Property(property="adresse", type="string"),
      *             @OA\Property(property="role", type="string")
      *         )
      *     ),
@@ -51,19 +53,21 @@ class EtudiantController extends Controller
     {
         // dd($request->all());
         try {
-            $request->validate([
+            $user = new User();
+            $validate= Validator::make($request->all(),[
                 'nom' => 'required|string|max:255',
                 'prenom' => 'required|string|max:255',
                 'adresse' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:6',
-                'telephone' => 'required|numeric|regex:/^\+[0-9]+$/|max:14',
+                'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+                'telephone' => 'nullable|string|regex:/^\+[0-9]+$/|unique:users|max:14',
                 'paysOrigine' => 'required|string|max:50',
                 'universite' => 'required|string|max:100',
-                'role' => 'required|string|in:etudiant',
             ]);
-
-            $user = new User();
+            if($validate->fails()){
+                return response()->json([
+                    'error' => $validate->errors()
+                ]);
+            }
             $etudiant = new Etudiant();
 
             $user->nom = $request->input('nom');
@@ -82,7 +86,7 @@ class EtudiantController extends Controller
 
             if ($etudiant->save()) {
                 return response()->json([
-                    "message" => "Etudiant enregistré avec success",
+                    "message" => "Etudiant enregistré avec succés",
                     "etudiant" => array_merge(array($etudiant), array($user))
                 ]);
             } else {
@@ -148,16 +152,20 @@ class EtudiantController extends Controller
         try {
             $user = Auth::user();
 
-            $request->validate([
+            $validate= Validator::make($request->all(),[
                 'nom' => 'required|string|max:255',
                 'prenom' => 'required|string|max:255',
                 'adresse' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-                'telephone' => 'nullable|numeric|regex:/^\+[0-9]+$/|max:14',
+                'telephone' => 'nullable|string|regex:/^\+[0-9]+$/|unique:users|max:14',
                 'paysOrigine' => 'required|string|max:50',
                 'universite' => 'required|string|max:100',
             ]);
-
+            if($validate->fails()){
+                return response()->json([
+                    'error' => $validate->errors()
+                ]);
+            }
             $user = User::findOrFail($user->id);
             $etudiant = Etudiant::where('user_id', $user->id)->first();
 

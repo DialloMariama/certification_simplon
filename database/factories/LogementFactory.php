@@ -17,7 +17,19 @@ class LogementFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'type' => 'Appartement',
+            'adresse' => 'médina',
+            'description' => '2 chambres',
+            'disponibilite' => '2024-03-19 12:30:00',
+            'superficie' =>  200,
+            'prix' => 3000,
+            'nombreChambre' =>  5,
+            'equipements' => 'climatisation',
+            'localite_id' => 2,
+            'proprietaire_id' => function () {
+                
+                return factory(\App\Models\Proprietaire::class)->create()->id;
+            },
         ];
     }
 }
