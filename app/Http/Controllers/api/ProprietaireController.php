@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\LogementRessource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\StoreProprietaireRequest;
@@ -39,6 +40,7 @@ class ProprietaireController extends Controller
      *             @OA\Property(property="telephone", type="string"),
      *             @OA\Property(property="email", type="string"),
      *             @OA\Property(property="password", type="string"),
+     *              @OA\Property(property="adresse", type="string", example="Adresse"),
      *             @OA\Property(property="role", type="string")
      *         )
      *     ),
@@ -68,7 +70,7 @@ class ProprietaireController extends Controller
             if ($validate->fails()) {
                 return response()->json([
                     'error' => $validate->errors()
-                ]);
+                ], 422);
             }
 
 
@@ -161,7 +163,7 @@ class ProprietaireController extends Controller
             if ($validate->fails()) {
                 return response()->json([
                     'error' => $validate->errors()
-                ]);
+                ], 422);
             }
             $user = User::findOrFail($user->id);
             $proprietaire = Proprietaire::where('user_id', $user->id)->first();
@@ -228,19 +230,23 @@ class ProprietaireController extends Controller
 
     public function index()
     {
-        try {
 
-            $user = Auth::user()->proprietaires()->first();
-            $logements = Logement::with('images')->where('proprietaire_id', $user->id)->get();
+        try {
+            $user = Auth::user();
+            $user = Auth::user();
+            $proprietaire = Proprietaire::where('user_id', $user->id)->first();
+
+            // $logement = Logement::where('proprietaire_id', $proprietaire->id)->get();
+
+            $logement = Logement::with(['commentaires', 'images', 'proprietaire'])->where('proprietaire_id', $proprietaire->id)->get();
 
             return response()->json([
-                "logements" => $logements,
+                LogementRessource::collection($logement),
             ]);
         } catch (ModelNotFoundException $e) {
-            return response()->json(["message" => "Logements non trouvés"], 404);
+            return response()->json(["message" => "Logement non trouvé"], 404);
         } catch (\Exception $e) {
             return response()->json(["message" => "Une erreur s'est produite"], 500);
         }
     }
-
 }

@@ -99,7 +99,8 @@ class AuthController extends Controller
      *         @OA\JsonContent(
      *             type="object"
      *         )
-     *     )
+     *     ),
+     *      security={{"bearerAuth": {}}},
      * )
      */
     public function userInformation()
@@ -178,8 +179,8 @@ class AuthController extends Controller
      *          description="L'utilisateur a été bloqué avec succès.",
      *          @OA\JsonContent(
      *              @OA\Property(property="status_code", type="integer", example=200),
-     *              @OA\Property(property="status_message", type="string", example="L'utilisateur a été bloqué avec succès."),
-     *              @OA\Property(property="data", type="object", example={...}),
+     *              @OA\Property(property="status_message", type="string", example="L'utilisateur a été bloqué avec succès"),
+     *              @OA\Property(property="data", type="object", example={}),
      *          ),
      *      ),
      *      @OA\Response(
@@ -244,7 +245,7 @@ class AuthController extends Controller
      *          @OA\JsonContent(
      *              @OA\Property(property="status_code", type="integer", example=200),
      *              @OA\Property(property="status_message", type="string", example="L'utilisateur a été débloqué avec succès."),
-     *              @OA\Property(property="data", type="object", example={...}),
+     *              @OA\Property(property="data", type="object", example={}),
      *          ),
      *      ),
      *      @OA\Response(
@@ -420,7 +421,7 @@ class AuthController extends Controller
     /**
      * @OA\Get(
      *      path="/api/logementsAdmin",
-     *      operationId="index",
+     *      operationId="indexAdmin",
      *      tags={"Authentification"},
      *      summary="Liste des logements pour un admin",
      *      description="Récupère la liste des logements avec leurs images associées pour un admin.",
@@ -428,7 +429,7 @@ class AuthController extends Controller
      *          response=200,
      *          description="Liste des logements récupérée avec succès.",
      *          @OA\JsonContent(
-     *              @OA\Property(property="logements", type="array", @OA\Items(ref="#/components/schemas/LogementWithImages")),
+     *          
      *          ),
      *      ),
      *      @OA\Response(

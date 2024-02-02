@@ -5,14 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Image extends Model
+class Newsletter extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'nomImage',
+        'email',
     ];
-    public function logement()
-    {
-        return $this->belongsTo(Logement::class);
-    }
 }

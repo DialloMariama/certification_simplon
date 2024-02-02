@@ -25,11 +25,8 @@ class LogementFactory extends Factory
             'prix' => 3000,
             'nombreChambre' =>  5,
             'equipements' => 'climatisation',
-            'localite_id' => 2,
-            'proprietaire_id' => function () {
-                
-                return factory(\App\Models\Proprietaire::class)->create()->id;
-            },
+            'localite_id' => 1,
+            
         ];
     }
 }

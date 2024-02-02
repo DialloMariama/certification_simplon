@@ -18,7 +18,7 @@ return new class extends Migration
             $table->float('prix');
             $table->text('description');
             $table->integer('nombreChambre');
-            $table->string('equipements');
+            $table->text('equipements');
             $table->dateTime('disponibilite');
             $table->float('superficie');
             $table->timestamps();

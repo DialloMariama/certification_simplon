@@ -36,7 +36,7 @@ services:
           - "8741:80"
         volumes:
             - ./docker/php/vhosts:/etc/apache2/sites-enabled
-            - ./:/var/www
+            - ./:/var/www/html
         restart: always
         networks:
             - tutorial

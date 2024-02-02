@@ -22,6 +22,7 @@ class UserTest extends TestCase
     }
     public function testUserLogin()
     {
+        $this->artisan('migrate:fresh');
         $password = 'passer123';
         $user = User::factory()->create([
             'role' => 'admin',
@@ -35,6 +36,7 @@ class UserTest extends TestCase
     }
     public function testInscriptionLogin()
     {
+        $this->artisan('migrate:fresh');
 
         $password = 'passer123';
         $user = User::factory()->create([
@@ -51,22 +53,24 @@ class UserTest extends TestCase
 
     public function testEmailIsUnique()
     {
-        $existingUser = User::factory()->create();
+        $this->artisan('migrate:fresh');
+        $existingUser = User::factory()->create(['role'=>'proprietaire']);
 
-        $response = $this->Post('/api/inscriptionEtudiant', [
+        $response = $this->Post('/api/inscriptionProprietaire', [
             'nom' => 'John',
             'prenom' => 'Doe',
-            'telephone' => '123456789',
+            'telephone' => '+221786574323',
             'adresse' => '123 Main Street',
             'email' => $existingUser->email,
             'password' => 'password123',
-            'role' => 'etudiant',
+            'role' => 'proprietaire',
         ]);
         $response->assertStatus(422);
     }
 
     public function test_Deconnexion()
     {
+        $this->artisan('migrate:fresh');
         $user = User::factory()->create();
         $this->actingAs($user);
         $token = JWTAuth::fromUser($user);

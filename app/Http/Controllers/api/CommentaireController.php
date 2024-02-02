@@ -301,7 +301,7 @@ class CommentaireController extends Controller
     /**
  * @OA\Delete(
  *      path="/api/supprimerCommentaires/{id}",
- *      operationId="deleteCommentaire",
+ *      operationId="deleteCommentaireByAdmin",
  *      tags={"Commentaires"},
  *      summary="Supprimer un commentaire par un admin",
  *      description="Supprime un commentaire en fonction de l'ID fourni.",

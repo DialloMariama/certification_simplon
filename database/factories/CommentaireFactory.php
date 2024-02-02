@@ -18,7 +18,7 @@ class CommentaireFactory extends Factory
     {
         return [
             'texte' => 'studio',
-            'logement_id' => 8,
+            'logement_id' => 1,
         ];
     }
 }

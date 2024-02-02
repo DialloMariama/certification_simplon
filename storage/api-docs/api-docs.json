@@ -1,5 +1,9 @@
 {
     "openapi": "3.0.0",
+    "info": {
+        "title": "CERTIFICATION-SIMPLON",
+        "version": "1.0"
+    },
     "paths": {
         "/api/annonces": {
             "get": {
@@ -23,12 +27,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Liste de toutes les annonces"
-                                        },
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Annonce"
-                                            }
                                         }
                                     },
                                     "type": "object"
@@ -98,9 +96,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Annonce créée avec succès"
-                                        },
-                                        "annonce": {
-                                            "$ref": "#/components/schemas/Annonce"
                                         }
                                     },
                                     "type": "object"
@@ -164,14 +159,7 @@
                         "description": "Annonce récupérée avec succès",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "Annonce": {
-                                            "$ref": "#/components/schemas/Annonce"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
+                                "schema": {}
                             }
                         }
                     },
@@ -228,10 +216,7 @@
                         "name": "annonce",
                         "in": "path",
                         "description": "Objet de l'annonce à mettre à jour",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/components/schemas/Annonce"
-                        }
+                        "required": true
                     }
                 ],
                 "requestBody": {
@@ -265,9 +250,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Annonce mise à jour avec succès"
-                                        },
-                                        "annonce": {
-                                            "$ref": "#/components/schemas/Annonce"
                                         }
                                     },
                                     "type": "object"
@@ -420,9 +402,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Annonce marquée comme prise en charge avec succès"
-                                        },
-                                        "annonce": {
-                                            "$ref": "#/components/schemas/Annonce"
                                         }
                                     },
                                     "type": "object"
@@ -493,7 +472,7 @@
                 ],
                 "summary": "Supprimer une annonce par un admin",
                 "description": "Supprime une annonce en fonction de l'ID fourni.",
-                "operationId": "deleteAnnonce",
+                "operationId": "deleteAnnonceByAdmin",
                 "parameters": [
                     {
                         "name": "id",
@@ -636,7 +615,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/logout": {
@@ -694,6 +678,190 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/bloquerUser/{user}": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Bloquer un utilisateur",
+                "description": "Bloque un utilisateur dans le système.",
+                "operationId": "bloquerUser",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "ID de l'utilisateur à bloquer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "L'utilisateur a été bloqué avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "status_message": {
+                                            "type": "string",
+                                            "example": "L'utilisateur a été bloqué avec succès"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Le user est déjà bloqué.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "status_message": {
+                                            "type": "string",
+                                            "example": "Le user est déjà bloqué."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur lors du bloquage du user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "status_message": {
+                                            "type": "string",
+                                            "example": "Erreur lors du bloquage du user."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/debloquerUser/{user}": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Débloquer un utilisateur",
+                "description": "Débloque un utilisateur dans le système.",
+                "operationId": "debloquerUser",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "ID de l'utilisateur à débloquer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "L'utilisateur a été débloqué avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "status_message": {
+                                            "type": "string",
+                                            "example": "L'utilisateur a été débloqué avec succès."
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": []
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Le user est déjà débloqué.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 400
+                                        },
+                                        "status_message": {
+                                            "type": "string",
+                                            "example": "Le user est déjà débloqué."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur lors du débloquage du user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "status_message": {
+                                            "type": "string",
+                                            "example": "Erreur lors du débloquage du user."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/utilisateursBloques": {
@@ -879,23 +1047,13 @@
                 ],
                 "summary": "Liste des logements pour un admin",
                 "description": "Récupère la liste des logements avec leurs images associées pour un admin.",
-                "operationId": "index",
+                "operationId": "indexAdmin",
                 "responses": {
                     "200": {
                         "description": "Liste des logements récupérée avec succès.",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "logements": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/LogementWithImages"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
+                                "schema": {}
                             }
                         }
                     },
@@ -1233,7 +1391,7 @@
                 ],
                 "summary": "Supprimer un commentaire par un admin",
                 "description": "Supprime un commentaire en fonction de l'ID fourni.",
-                "operationId": "deleteCommentaire",
+                "operationId": "deleteCommentaireByAdmin",
                 "parameters": [
                     {
                         "name": "id",
@@ -1492,6 +1650,73 @@
                 ]
             }
         },
+        "/api/AnnonceEtudiant": {
+            "get": {
+                "tags": [
+                    "Etudiants"
+                ],
+                "summary": "Obtenir la liste des annonces d'un étudiant",
+                "description": "Récupère la liste des annonces associés à un étudinat.",
+                "operationId": "getEtudiantAnnonces",
+                "responses": {
+                    "200": {
+                        "description": "Liste des annonces récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "annonces": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Annonces non trouvées",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Annonces non trouvées"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/forget-password": {
             "post": {
                 "tags": [
@@ -1580,7 +1805,7 @@
                         "multipart/form-data": {
                             "schema": {
                                 "properties": {
-                                    "image": {
+                                    "image[]": {
                                         "description": "Fichier image à téléverser",
                                         "type": "array",
                                         "items": {
@@ -1604,9 +1829,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Image ajoutée avec succès"
-                                        },
-                                        "image": {
-                                            "$ref": "#/components/schemas/Image"
                                         }
                                     },
                                     "type": "object"
@@ -1791,12 +2013,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Liste de toutes les localités"
-                                        },
-                                        "localite": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Localite"
-                                            }
                                         }
                                     },
                                     "type": "object"
@@ -1867,9 +2083,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Localité enregistrée avec succès"
-                                        },
-                                        "localite": {
-                                            "$ref": "#/components/schemas/Localite"
                                         }
                                     },
                                     "type": "object"
@@ -1970,9 +2183,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Localité modifiée avec succès"
-                                        },
-                                        "localite": {
-                                            "$ref": "#/components/schemas/Localite"
                                         }
                                     },
                                     "type": "object"
@@ -2131,12 +2341,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Liste de tous les logements récupérée avec succès"
-                                        },
-                                        "logement": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/LogementWithCommentairesAndImage"
-                                            }
                                         }
                                     },
                                     "type": "object"
@@ -2191,7 +2395,7 @@
                     "description": "Données du logement",
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "required": [
                                     "adresse",
@@ -2244,11 +2448,11 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "image": {
+                                    "image[]": {
                                         "description": "Tableau d'images du logement",
                                         "type": "array",
                                         "items": {
-                                            "type": "file",
+                                            "type": "string",
                                             "format": "binary"
                                         }
                                     }
@@ -2268,15 +2472,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Logement enregistré avec succès"
-                                        },
-                                        "logement": {
-                                            "$ref": "#/components/schemas/Logement"
-                                        },
-                                        "images": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Image"
-                                            }
                                         }
                                     },
                                     "type": "object"
@@ -2337,14 +2532,7 @@
                         "description": "Logement récupéré avec succès",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "logement": {
-                                            "$ref": "#/components/schemas/Logement"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
+                                "schema": {}
                             }
                         }
                     },
@@ -2411,7 +2599,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "properties": {
                                     "adresse": {
@@ -2445,7 +2633,7 @@
                                     "remplacer_images": {
                                         "type": "boolean"
                                     },
-                                    "image": {
+                                    "image[]": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
@@ -2468,15 +2656,6 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Logement mis à jour avec succès"
-                                        },
-                                        "logement": {
-                                            "$ref": "#/components/schemas/Logement"
-                                        },
-                                        "images": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/components/schemas/Image"
-                                            }
                                         }
                                     },
                                     "type": "object"
@@ -2707,6 +2886,166 @@
                 ]
             }
         },
+        "/api/logementParlocalite/{localite}": {
+            "get": {
+                "tags": [
+                    "Logements"
+                ],
+                "summary": "Obtenir les logements par localité",
+                "description": "Renvoie les logements associés à une localité spécifiée.",
+                "operationId": "logementParLocalite",
+                "parameters": [
+                    {
+                        "name": "localite",
+                        "in": "path",
+                        "description": "Instance de la classe Localite.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Logements trouvés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "statut": {
+                                            "type": "string",
+                                            "example": "OK"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Localité non trouvée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "statut": {
+                                            "type": "string",
+                                            "example": "Erreur"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Localité non trouvée"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "statut": {
+                                            "type": "string",
+                                            "example": "Erreur"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/newsletter": {
+            "post": {
+                "tags": [
+                    "Newsletter"
+                ],
+                "summary": "Créer une nouvelle inscription à la newsletter",
+                "description": "Créer une nouvelle inscription à la newsletter avec l'adresse e-mail fournie",
+                "operationId": "createNewsletter",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "description": "L'adresse e-mail pour l'inscription à la newsletter",
+                                        "type": "string",
+                                        "format": "email"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Inscription à la newsletter créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Message de succès",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "description": "Détails de l'erreur de validation",
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "description": "Message d'erreur",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/inscriptionProprietaire": {
             "post": {
                 "tags": [
@@ -2743,6 +3082,10 @@
                                     },
                                     "password": {
                                         "type": "string"
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "Adresse"
                                     },
                                     "role": {
                                         "type": "string"

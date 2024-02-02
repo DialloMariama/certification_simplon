@@ -16,7 +16,8 @@ class AnnonceTest extends TestCase
      */
     public function testAjoutAnnonce()
     {
-        $user = User::factory()->create();
+        $this->artisan('migrate:fresh');
+        $user = User::factory()->create(['role'=> 'etudiant']);
         $etudiant = Etudiant::factory()->create(['user_id' => $user->id]);
 
         $this->actingAs($user);
@@ -33,7 +34,8 @@ class AnnonceTest extends TestCase
 
     public function testModificationAnnonce()
     {
-        $user = User::factory()->create();
+        $this->artisan('migrate:fresh');
+        $user = User::factory()->create(['role'=> 'etudiant']);
         $etudiant = Etudiant::factory()->create(['user_id' => $user->id]);
         $annonce = Annonce::factory()->create(['etudiant_id' => $etudiant->id]);
 
@@ -51,7 +53,8 @@ class AnnonceTest extends TestCase
 
     public function testSuppressionAnnonce()
     {
-        $user = User::factory()->create();
+        $this->artisan('migrate:fresh');
+        $user = User::factory()->create(['role'=> 'etudiant']);
         $etudiant = Etudiant::factory()->create(['user_id' => $user->id]);
         $annonce = Annonce::factory()->create(['etudiant_id' => $etudiant->id]);
 
@@ -64,7 +67,8 @@ class AnnonceTest extends TestCase
 
     public function testMarquerAnnoncePrisEnCharge()
     {
-        $user = User::factory()->create();
+        $this->artisan('migrate:fresh');
+        $user = User::factory()->create(['role'=> 'etudiant']);
         $etudiant = Etudiant::factory()->create(['user_id' => $user->id]);
         $annonce = Annonce::factory()->create(['etudiant_id' => $etudiant->id]);
 

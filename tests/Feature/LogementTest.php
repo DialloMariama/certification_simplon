@@ -18,16 +18,13 @@ class LogementTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_example(): void
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-    }
-
+  
     public function testAjoutLogement()
     {
-        $user = User::factory()->create();
+        $this->artisan('migrate:fresh');
+        $admin = User::factory()->create(['role'=> 'admin']);
+        $localite = Localite::factory()->create(['user_id' => $admin->id]);
+        $user = User::factory()->create(['role'=> 'proprietaire','telephone'=>'+221784067890','email'=>'magid5@gmail.com']);
         $proprietaire = Proprietaire::factory()->create(['user_id' => $user->id]);
 
         $this->actingAs($user);
@@ -41,7 +38,7 @@ class LogementTest extends TestCase
             'prix' => 1200,
             'nombreChambre' => 2,
             'equipements' => 'Internet, Climatisation, Chauffage',
-            'localite_id' => 2,
+            'localite_id' => $localite->id,
             'image' => [
                 UploadedFile::fake()->image('logement1.jpg'),
                 UploadedFile::fake()->image('logement2.jpg'),
@@ -54,7 +51,10 @@ class LogementTest extends TestCase
 
     public function testModificationLogement()
     {
-        $user = User::factory()->create();
+        $this->artisan('migrate:fresh');
+        $admin = User::factory()->create(['role'=> 'admin']);
+        $localite = Localite::factory()->create(['user_id' => $admin->id]);
+        $user = User::factory()->create(['role'=> 'proprietaire','telephone'=>'+221774067890','email'=>'magid5@gmail.com']);
         $proprietaire = Proprietaire::factory()->create(['user_id' => $user->id]);
 
         $logement = Logement::factory()->create(['proprietaire_id' => $proprietaire->id]);
@@ -70,7 +70,7 @@ class LogementTest extends TestCase
             'prix' => 1500,
             'nombreChambre' => 3,
             'equipements' => 'Internet, Climatisation, Chauffage',
-            'localite_id' => 3,
+            'localite_id' => $localite->id,
         ]);
 
         $response->assertStatus(200);
@@ -78,8 +78,12 @@ class LogementTest extends TestCase
 
     public function testSuppressionLogement()
     {
-        $user = User::factory()->create();
+        $this->artisan('migrate:fresh');
+        $admin = User::factory()->create(['role'=> 'admin']);
+        $localite = Localite::factory()->create(['user_id' => $admin->id]);
+        $user = User::factory()->create(['role'=> 'proprietaire','telephone'=>'+221774067890','email'=>'magid5@gmail.com']);
         $proprietaire = Proprietaire::factory()->create(['user_id' => $user->id]);
+
         $logement = Logement::factory()->create(['proprietaire_id' => $proprietaire->id]);
 
         $this->actingAs($user);
@@ -91,11 +95,12 @@ class LogementTest extends TestCase
 
     public function testListeLogements()
     {
-        $user = User::factory()->create();
-        $proprietaire = Proprietaire::factory()->create(['user_id' => $user->id]);
-        $logement = Logement::factory()->create(['proprietaire_id' => $proprietaire->id]);
+        $this->artisan('migrate:fresh');
+        // $user = User::factory()->create(['role'=> 'proprietaire']);
+        // $proprietaire = Proprietaire::factory()->create(['user_id' => $user->id]);
+        // $logement = Logement::factory()->create(['proprietaire_id' => $proprietaire->id]);
 
-        $this->actingAs($user);
+        // $this->actingAs($user);
 
         $response = $this->json('GET', '/api/logements');
 

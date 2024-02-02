@@ -8,7 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class Logement extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'adresse',
+        'type',
+        'prix',
+        'description',
+        'equipements',
+        'localite_id',
+        'disponibilite',
+        'superficie',
+        'nombreChambre',
+        'image',
 
+
+    ];
 
     public function images()
     {

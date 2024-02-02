@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Http\Controllers\Controller;
+
 use App\Models\Annonce;
 
 
 use App\Models\Etudiant;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\AnnonceRessource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -36,7 +38,6 @@ class AnnonceController extends Controller
      *          @OA\JsonContent(
      *              @OA\Property(property="status_code", type="integer", example=200),
      *              @OA\Property(property="message", type="string", example="Liste de toutes les annonces"),
-     *              @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Annonce")),
      *          ),
      *      ),
      *      @OA\Response(
@@ -50,13 +51,10 @@ class AnnonceController extends Controller
      */
     public function index()
     {
-        $annonces = Annonce::where('prisEnCharge', false)->get();
+        $annonces = Annonce::with('etudiant')->where('prisEnCharge', false)->get();
 
-        return response()->json([
-            'status_code' => 200,
-            'message' => 'Liste de toutes les annonces',
-            'data' => $annonces,
-        ]);
+
+        return AnnonceRessource::collection($annonces);
     }
 
 
@@ -92,7 +90,6 @@ class AnnonceController extends Controller
      *          description="Annonce créée avec succès",
      *          @OA\JsonContent(
      *              @OA\Property(property="message", type="string", example="Annonce créée avec succès"),
-     *              @OA\Property(property="annonce", ref="#/components/schemas/Annonce"),
      *          ),
      *      ),
      *      @OA\Response(
@@ -109,12 +106,12 @@ class AnnonceController extends Controller
      */
     public function store(Request $request)
     {
-       $validate= Validator::make($request->all(),[
+        $validate = Validator::make($request->all(), [
             'description' => 'required|string',
             'budget' => 'required|numeric',
             'caracteristiques' => 'required|string',
         ]);
-        if($validate->fails()){
+        if ($validate->fails()) {
             return response()->json([
                 'error' => $validate->errors()
             ]);
@@ -156,7 +153,7 @@ class AnnonceController extends Controller
      *          response=200,
      *          description="Annonce récupérée avec succès",
      *          @OA\JsonContent(
-     *              @OA\Property(property="Annonce", ref="#/components/schemas/Annonce"),
+   
      *          ),
      *      ),
      *      @OA\Response(
@@ -216,7 +213,6 @@ class AnnonceController extends Controller
      *          description="Objet de l'annonce à mettre à jour",
      *          required=true,
      *          in="path",
-     *          @OA\Schema(ref="#/components/schemas/Annonce"),
      *      ),
      *      @OA\RequestBody(
      *          required=true,
@@ -231,7 +227,7 @@ class AnnonceController extends Controller
      *          description="Annonce mise à jour avec succès",
      *          @OA\JsonContent(
      *              @OA\Property(property="message", type="string", example="Annonce mise à jour avec succès"),
-     *              @OA\Property(property="annonce", ref="#/components/schemas/Annonce"),
+     
      *          ),
      *      ),
      *      @OA\Response(
@@ -256,12 +252,12 @@ class AnnonceController extends Controller
     public function update(Request $request, Annonce $annonce)
     {
         try {
-            $validate= Validator::make($request->all(),[
+            $validate = Validator::make($request->all(), [
                 'description' => 'required|string',
                 'budget' => 'required|numeric',
                 'caracteristiques' => 'required|string',
             ]);
-            if($validate->fails()){
+            if ($validate->fails()) {
                 return response()->json([
                     'error' => $validate->errors()
                 ]);
@@ -372,7 +368,7 @@ class AnnonceController extends Controller
      *          description="Annonce marquée comme prise en charge avec succès",
      *          @OA\JsonContent(
      *              @OA\Property(property="message", type="string", example="Annonce marquée comme prise en charge avec succès"),
-     *              @OA\Property(property="annonce", ref="#/components/schemas/Annonce"),
+    
      *          ),
      *      ),
      *      @OA\Response(
@@ -423,44 +419,44 @@ class AnnonceController extends Controller
     }
 
 
- /**
- * @OA\Delete(
- *      path="/api/supprimerAnnonces/{id}",
- *      operationId="deleteAnnonce",
- *      tags={"Annonces"},
- *      summary="Supprimer une annonce par un admin",
- *      description="Supprime une annonce en fonction de l'ID fourni.",
- *      @OA\Parameter(
- *          name="id",
- *          description="ID de l'annonce à supprimer",
- *          required=true,
- *          in="path",
- *          @OA\Schema(type="integer", format="int64"),
- *      ),
- *      @OA\Response(
- *          response=200,
- *          description="Annonce supprimée",
- *          @OA\JsonContent(
- *              @OA\Property(property="message", type="string", example="Annonce supprimée"),
- *          ),
- *      ),
- *      @OA\Response(
- *          response=403,
- *          description="Vous n'avez pas la permission de supprimer cette annonce",
- *          @OA\JsonContent(
- *              @OA\Property(property="error", type="string", example="Vous n'avez pas la permission de supprimer cette annonce."),
- *          ),
- *      ),
- *      @OA\Response(
- *          response=404,
- *          description="Annonce non trouvée",
- *          @OA\JsonContent(
- *              @OA\Property(property="error", type="string", example="Annonce non trouvée"),
- *          ),
- *      ),
- *      security={{"bearerAuth": {}}},
- * )
- */
+    /**
+     * @OA\Delete(
+     *      path="/api/supprimerAnnonces/{id}",
+     *      operationId="deleteAnnonceByAdmin",
+     *      tags={"Annonces"},
+     *      summary="Supprimer une annonce par un admin",
+     *      description="Supprime une annonce en fonction de l'ID fourni.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="ID de l'annonce à supprimer",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer", format="int64"),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Annonce supprimée",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Annonce supprimée"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Vous n'avez pas la permission de supprimer cette annonce",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="error", type="string", example="Vous n'avez pas la permission de supprimer cette annonce."),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Annonce non trouvée",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="error", type="string", example="Annonce non trouvée"),
+     *          ),
+     *      ),
+     *      security={{"bearerAuth": {}}},
+     * )
+     */
     public function destroyByAdmin($id)
     {
         try {

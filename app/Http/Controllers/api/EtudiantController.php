@@ -3,13 +3,17 @@
 namespace App\Http\Controllers\api;
 
 use App\Models\User;
+use App\Models\Annonce;
 use App\Models\Etudiant;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\AnnonceRessource;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\AnnonceDetailRessource;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
  * @OA\Tag(
@@ -58,7 +62,7 @@ class EtudiantController extends Controller
                 'nom' => 'required|string|max:255',
                 'prenom' => 'required|string|max:255',
                 'adresse' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+                'email' => 'required|string|email|max:255|unique:users,email',
                 'telephone' => 'nullable|string|regex:/^\+[0-9]+$/|unique:users|max:14',
                 'paysOrigine' => 'required|string|max:50',
                 'universite' => 'required|string|max:100',
@@ -66,7 +70,7 @@ class EtudiantController extends Controller
             if($validate->fails()){
                 return response()->json([
                     'error' => $validate->errors()
-                ]);
+                ], 422);
             }
             $etudiant = new Etudiant();
 
@@ -164,7 +168,7 @@ class EtudiantController extends Controller
             if($validate->fails()){
                 return response()->json([
                     'error' => $validate->errors()
-                ]);
+                ], 422);
             }
             $user = User::findOrFail($user->id);
             $etudiant = Etudiant::where('user_id', $user->id)->first();
@@ -201,10 +205,60 @@ class EtudiantController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+
+     /**
+     * @OA\Get(
+     *      path="/api/AnnonceEtudiant",
+     *      operationId="getEtudiantAnnonces",
+     *      tags={"Etudiants"},
+     *      summary="Obtenir la liste des annonces d'un étudiant",
+     *      description="Récupère la liste des annonces associés à un étudinat.",
+     *      security={{"bearerAuth": {}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Liste des annonces récupérée avec succès",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="annonces", type="array", @OA\Items(type="object")),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Annonces non trouvées",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Annonces non trouvées"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Une erreur s'est produite",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Une erreur s'est produite"),
+     *          ),
+     *      ),
+     *      security={{"bearerAuth": {}}},
+     * 
+     * )
+     */
+    public function indexEtudiant()
     {
-        //
+       
+            try {
+            $user = Auth::user();
+            $etudiant = Etudiant::where('user_id', $user->id)->first();
+    
+            $annonce = Annonce::where('etudiant_id', $etudiant->id)->get();
+
+                return response()->json([
+                    AnnonceDetailRessource::collection($annonce),
+                ]);
+            } catch (ModelNotFoundException $e) {
+                return response()->json(["message" => "Annonce non trouvé"], 404);
+            } catch (\Exception $e) {
+                return response()->json(["message" => "Une erreur s'est produite"], 500);
+            }
+        
     }
+
 
     /**
      * Show the form for creating a new resource.

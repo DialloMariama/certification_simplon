@@ -14,8 +14,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\LogementRessource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use App\Http\Resources\LogementDetailRessource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
@@ -42,7 +44,6 @@ class LogementController extends Controller
      *          description="Liste de tous les logements récupérée avec succès",
      *          @OA\JsonContent(
      *              @OA\Property(property="message", type="string", example="Liste de tous les logements récupérée avec succès"),
-     *              @OA\Property(property="logement", type="array", @OA\Items(ref="#/components/schemas/LogementWithCommentairesAndImage")),
      *          ),
      *      ),
      *      @OA\Response(
@@ -64,12 +65,10 @@ class LogementController extends Controller
     public function index()
     {
         try {
-            $logement = Logement::with(['commentaires', 'images' => function ($query) {
-                $query->first();
-            }])->get();
+            $logement = Logement::with(['commentaires', 'images', 'proprietaire'])->get();
 
             return response()->json([
-                "logement" => $logement,
+                LogementRessource::collection($logement),
             ]);
         } catch (ModelNotFoundException $e) {
             return response()->json(["message" => "Logement non trouvé"], 404);
@@ -92,55 +91,56 @@ class LogementController extends Controller
      */
 
     /**
-     * @OA\Post(
-     *      path="/api/ajoutLogements",
-     *      operationId="createLogement",
-     *      tags={"Logements"},
-     *      summary="Créer un nouveau logement",
-     *      description="Crée un nouveau logement avec les détails fournis.",
-     *      @OA\RequestBody(
-     *          required=true,
-     *          description="Données du logement",
-     *          @OA\JsonContent(
-     *              required={"adresse", "type", "disponibilite", "description", "superficie", "prix", "equipements", "localite_id", "image"},
-     *              @OA\Property(property="adresse", type="string", description="Adresse du logement"),
-     *              @OA\Property(property="type", type="string", description="Type de logement"),
-     *              @OA\Property(property="disponibilite", type="date", description="Date de disponibilité du logement"),
-     *              @OA\Property(property="description", type="string", description="Description du logement"),
-     *              @OA\Property(property="superficie", type="numeric", description="Superficie du logement"),
-     *              @OA\Property(property="prix", type="numeric", description="Prix du logement"),
-     *              @OA\Property(property="nombreChambre", type="integer", description="Nombre de chambres du logement", minimum=1),
-     *              @OA\Property(property="equipements", type="string", description="Équipements du logement"),
-     *              @OA\Property(property="localite_id", type="integer", description="ID de la localité associée", example=1),
-     *              @OA\Property(property="image", type="array", description="Tableau d'images du logement",
-     *                  @OA\Items(type="file", format="binary")
-     *              ),
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Logement enregistré avec succès",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="message", type="string", example="Logement enregistré avec succès"),
-     *              @OA\Property(property="logement", ref="#/components/schemas/Logement"),
-     *              @OA\Property(property="images", type="array", @OA\Items(ref="#/components/schemas/Image")),
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=422,
-     *          description="Erreur de validation",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="errors", type="object", example={"adresse": {"Le champ adresse est obligatoire."}})
-     *          ),
-     *      ),
-     *      security={{"bearerAuth": {}}},
-     * 
-     * )
-     */
+ * @OA\Post(
+ *      path="/api/ajoutLogements",
+ *      operationId="createLogement",
+ *      tags={"Logements"},
+ *      summary="Créer un nouveau logement",
+ *      description="Crée un nouveau logement avec les détails fournis.",
+ *      @OA\RequestBody(
+ *          required=true,
+ *          description="Données du logement",
+ *          @OA\MediaType(
+ *              mediaType="multipart/form-data",
+ *              @OA\Schema(
+ *                  required={"adresse", "type", "disponibilite", "description", "superficie", "prix", "equipements", "localite_id", "image"},
+ *                  @OA\Property(property="adresse", type="string", description="Adresse du logement"),
+ *                  @OA\Property(property="type", type="string", description="Type de logement"),
+ *                  @OA\Property(property="disponibilite", type="date", description="Date de disponibilité du logement"),
+ *                  @OA\Property(property="description", type="string", description="Description du logement"),
+ *                  @OA\Property(property="superficie", type="numeric", description="Superficie du logement"),
+ *                  @OA\Property(property="prix", type="numeric", description="Prix du logement"),
+ *                  @OA\Property(property="nombreChambre", type="integer", description="Nombre de chambres du logement", minimum=1),
+ *                  @OA\Property(property="equipements", type="string", description="Équipements du logement"),
+ *                  @OA\Property(property="localite_id", type="integer", description="ID de la localité associée", example=1),
+ *                  @OA\Property(property="image[]", type="array", description="Tableau d'images du logement",
+ *                      @OA\Items(type="string", format="binary"),
+ *                  ),
+ *              )
+ *          )
+ *      ),
+ *      @OA\Response(
+ *          response=200,
+ *          description="Logement enregistré avec succès",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="Logement enregistré avec succès"),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=422,
+ *          description="Erreur de validation",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="errors", type="object", example={"adresse": {"Le champ adresse est obligatoire."}})
+ *          ),
+ *      ),
+ *      security={{"bearerAuth": {}}},
+ * )
+ */
+
     public function store(Request $request)
     {
         try {
-            $validate= Validator::make($request->all(),[
+            $validate = Validator::make($request->all(), [
                 'adresse' => 'required|string|max:255',
                 'type' => 'required|string|max:255',
                 'disponibilite' => 'required|date',
@@ -152,14 +152,13 @@ class LogementController extends Controller
                 'localite_id' => 'required|exists:localites,id',
                 'image.*' => 'required|file',
             ]);
-            if($validate->fails()){
+            if ($validate->fails()) {
                 return response()->json([
                     'error' => $validate->errors()
-                ]);
+                ], 422);
             }
 
             $proprietaire = Proprietaire::where('user_id', Auth::user()->id)->first();
-            
 
             $logements = new Logement();
 
@@ -223,7 +222,6 @@ class LogementController extends Controller
      *          response=200,
      *          description="Logement récupéré avec succès",
      *          @OA\JsonContent(
-     *              @OA\Property(property="logement", ref="#/components/schemas/Logement"),
      *          ),
      *      ),
      *      @OA\Response(
@@ -246,17 +244,25 @@ class LogementController extends Controller
      */
     public function show($id)
     {
-        try {
-            $logements = Logement::with('images')->findOrFail($id);
+        // try {
+        //     $logements = Logement::with('images')->findOrFail($id);
 
-            return response()->json([
-                "logement" => $logements,
-            ]);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(["message" => "Logement non trouvé"], 404);
-        } catch (\Exception $e) {
-            return response()->json(["message" => "Une erreur s'est produite"], 500);
-        }
+        //     return response()->json([
+        //         "logement" => $logements,
+        //     ]);
+        // } catch (ModelNotFoundException $e) {
+        //     return response()->json(["message" => "Logement non trouvé"], 404);
+        // } catch (\Exception $e) {
+        //     return response()->json(["message" => "Une erreur s'est produite"], 500);
+        // }
+        $logements = Logement::where('id',  $id)->with(
+            [
+                'localite',
+                'proprietaire',
+                'images',
+            ]
+        )->get();
+        return LogementDetailRessource::collection($logements);
     }
 
 
@@ -291,7 +297,7 @@ class LogementController extends Controller
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\MediaType(
-     *              mediaType="application/json",
+     *              mediaType="multipart/form-data",
      *              @OA\Schema(
      *                  @OA\Property(property="adresse", type="string"),
      *                  @OA\Property(property="type", type="string"),
@@ -303,7 +309,7 @@ class LogementController extends Controller
      *                  @OA\Property(property="equipements", type="string"),
      *                  @OA\Property(property="localite_id", type="integer"),
      *                  @OA\Property(property="remplacer_images", type="boolean"),
-     *                  @OA\Property(property="image", type="array", @OA\Items(type="string", format="binary")),
+     *                  @OA\Property(property="image[]", type="array", @OA\Items(type="string", format="binary")),
      *              ),
      *          ),
      *      ),
@@ -312,8 +318,7 @@ class LogementController extends Controller
      *          description="Logement mis à jour avec succès",
      *          @OA\JsonContent(
      *              @OA\Property(property="message", type="string", example="Logement mis à jour avec succès"),
-     *              @OA\Property(property="logement", ref="#/components/schemas/Logement"),
-     *              @OA\Property(property="images", type="array", @OA\Items(ref="#/components/schemas/Image")),
+     *     
      *          ),
      *      ),
      *      @OA\Response(
@@ -354,17 +359,16 @@ class LogementController extends Controller
             $user = Auth::user();
             $proprietaire = Proprietaire::where('user_id', $user->id)->first();
 
-            $logement = $proprietaire->logements()->find($id);
+            // $logement = $proprietaire->logements()->find($id);
+        $logement = Logement::where('proprietaire_id', $proprietaire->id)->find($id);
+
 
             if (!$logement) {
                 return response()->json(['error' => 'Vous n\'avez pas la permission de modifier ce logement.'], 403);
             }
+           
 
-            if ($request->has('remplacer_images') && $request->remplacer_images) {
-                $logement->images()->delete();
-            }
-         
-            $validate= Validator::make($request->all(),[
+            $validate = Validator::make($request->all(), [
                 'adresse' => 'required|string|max:255',
                 'type' => 'required|string|max:255',
                 'disponibilite' => 'required|date',
@@ -376,10 +380,10 @@ class LogementController extends Controller
                 'localite_id' => 'required|exists:localites,id',
                 'image.*' => 'nullable|file',
             ]);
-            if($validate->fails()){
+            if ($validate->fails()) {
                 return response()->json([
                     'error' => $validate->errors()
-                ]);
+                ], 422);
             }
 
             $logement->adresse = $request->input('adresse');
@@ -394,6 +398,13 @@ class LogementController extends Controller
             $logement->update();
 
             if ($request->file('image')) {
+                $images = $logement->images()->get();
+
+                foreach ($images as $image) {
+                    Storage::disk('public')->delete($image->nomImage);
+                    $images->delete();
+                }
+                
                 foreach ($request->file('image') as $file) {
                     $image = new Image();
                     $imagePath = $file->store('images/logement', 'public');
@@ -470,10 +481,16 @@ class LogementController extends Controller
     {
         $user = Auth::user();
         $proprietaire = Proprietaire::where('user_id', $user->id)->first();
-        $logement = $proprietaire->logements()->find($id);
+
+        $logement = Logement::where('proprietaire_id', $proprietaire->id)->find($id);
+
+        $images = $logement->images()->get();
 
         if (!$logement) {
             return response()->json(['error' => 'Vous n\'avez pas la permission de supprimer ce logement.'], 403);
+        }
+        foreach ($images as $image) {
+            Storage::disk('public')->delete($image->nomImage);
         }
         if ($logement->delete()) {
             return response()->json([
@@ -553,48 +570,45 @@ class LogementController extends Controller
 
 
     /**
- * @OA\Get(
- *      path="/api/logement-par-localite/{localite}",
- *      operationId="logementParLocalite",
- *      tags={"Logement"},
- *      summary="Obtenir les logements par localité",
- *      description="Renvoie les logements associés à une localité spécifiée.",
- *      @OA\Parameter(
- *          name="localite",
- *          description="Instance de la classe Localite.",
- *          required=true,
- *          in="path",
- *          @OA\Schema(type="integer", format="int64"),
- *      ),
- *      @OA\Response(
- *          response=200,
- *          description="Logements trouvés",
- *          @OA\JsonContent(
- *              @OA\Property(property="statut", type="string", example="OK"),
- *              @OA\Property(property="logements", type="array", @OA\Items(ref="#/components/schemas/Logement")),
- *          ),
- *      ),
- *      @OA\Response(
- *          response=404,
- *          description="Localité non trouvée",
- *          @OA\JsonContent(
- *              @OA\Property(property="statut", type="string", example="Erreur"),
- *              @OA\Property(property="message", type="string", example="Localité non trouvée"),
- *          ),
- *      ),
- *      @OA\Response(
- *          response=500,
- *          description="Erreur interne du serveur",
- *          @OA\JsonContent(
- *              @OA\Property(property="statut", type="string", example="Erreur"),
- *              @OA\Property(property="message", type="string", example="Une erreur s'est produite"),
- *          ),
- *      ),
- *      @OA\SecurityRequirement(
- *          bearerAuth={},
- *      ),
- * )
- */
+     * @OA\Get(
+     *      path="/api/logementParlocalite/{localite}",
+     *      operationId="logementParLocalite",
+     *      tags={"Logements"},
+     *      summary="Obtenir les logements par localité",
+     *      description="Renvoie les logements associés à une localité spécifiée.",
+     *      @OA\Parameter(
+     *          name="localite",
+     *          description="Instance de la classe Localite.",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer", format="int64"),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Logements trouvés",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="statut", type="string", example="OK"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Localité non trouvée",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="statut", type="string", example="Erreur"),
+     *              @OA\Property(property="message", type="string", example="Localité non trouvée"),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Erreur interne du serveur",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="statut", type="string", example="Erreur"),
+     *              @OA\Property(property="message", type="string", example="Une erreur s'est produite"),
+     *          ),
+     *      ),
+     *     
+     * )
+     */
     public function logementParLocalite(Localite $localite)
     {
         try {
@@ -613,7 +627,6 @@ class LogementController extends Controller
                 ], 404);
             }
         } catch (\Exception $e) {
-            // Capturez les exceptions pour éviter des erreurs non gérées.
             return response()->json([
                 'statut' => 'Erreur',
                 'message' => $e->getMessage(),

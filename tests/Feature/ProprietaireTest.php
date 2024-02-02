@@ -15,6 +15,7 @@ class ProprietaireTest extends TestCase
      */
     public function testInscriptionProprietaire()
     {
+        $this->artisan('migrate:fresh');
         $response = $this->json('POST', '/api/inscriptionProprietaire', [
             'nom' => 'BAH',
             'prenom' => 'Magid',
@@ -34,7 +35,8 @@ class ProprietaireTest extends TestCase
 
     public function testModificationProprietaire()
     {
-        $user = User::factory()->create();
+        $this->artisan('migrate:fresh');
+        $user = User::factory()->create(['role'=> 'proprietaire']);
         $proprietaire = Proprietaire::factory()->create(['user_id' => $user->id]);
 
         $this->actingAs($user);

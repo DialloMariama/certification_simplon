@@ -8,6 +8,7 @@ use App\Http\Controllers\api\AnnonceController;
 use App\Http\Controllers\api\EtudiantController;
 use App\Http\Controllers\api\LocaliteController;
 use App\Http\Controllers\api\LogementController;
+use App\Http\Controllers\api\NewsletterController;
 use App\Http\Controllers\api\CommentaireController;
 use App\Http\Controllers\api\ProprietaireController;
 use App\Http\Controllers\api\ForgotPasswordController;
@@ -26,7 +27,7 @@ use App\Http\Controllers\api\ForgotPasswordController;
 Route::get('logements', [LogementController::class, 'index']);
 Route::get('annonces', [AnnonceController::class, 'index']);
 Route::get('logementParlocalite/{localite}', [LogementController::class, 'logementParLocalite']);
-
+Route::post('newsletter', [NewsletterController::class, 'create']);
 
 Route::post('forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
 Route::get('reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
@@ -76,6 +77,8 @@ Route::middleware('auth:api', 'etudiant')->group(function () {
     Route::put('annonces/{annonce}', [AnnonceController::class, 'update']);
     Route::delete('annonces/{id}', [AnnonceController::class, 'destroy']);
     Route::put('marquerPrisEncharge/{id}', [AnnonceController::class, 'marquerPriseEnCharge']);
+    Route::get('AnnonceEtudiant', [EtudiantController::class, 'indexEtudiant']);
+
 });
 
 Route::middleware('auth:api', 'proprietaire')->group(function () {

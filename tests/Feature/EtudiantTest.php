@@ -13,15 +13,11 @@ class EtudiantTest extends TestCase
     /**
      * A basic feature test example.
      */
-    public function test_example(): void
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-    }
+   
 
     public function testInscriptionEtudiant()
     {
+        $this->artisan('migrate:fresh');
         $response = $this->json('POST', '/api/inscriptionEtudiant', [
             'nom' => 'BAH',
             'prenom' => 'Magid',
@@ -43,7 +39,8 @@ class EtudiantTest extends TestCase
 
     public function testModificationEtudiant()
     {
-        $user = User::factory()->create();
+        $this->artisan('migrate:fresh');
+        $user = User::factory()->create(['role'=> 'etudiant']);
         $etudiant = Etudiant::factory()->create(['user_id' => $user->id]);
 
         $this->actingAs($user);

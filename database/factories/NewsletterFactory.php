@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Localite>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Newsletter>
  */
-class LocaliteFactory extends Factory
+class NewsletterFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,8 +17,8 @@ class LocaliteFactory extends Factory
     public function definition(): array
     {
         return [
-            'nomLocalite' => 'Médina',
-            'commune' => 'Dakar',
+            'email' => 'adama@gmail.com',
+            
         ];
     }
 }

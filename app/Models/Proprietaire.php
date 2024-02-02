@@ -18,7 +18,7 @@ class Proprietaire extends Model
     }
     public function logements()
     {
-        return $this->hasMany(Logement::class);
+        return $this->hasMany(Logement::class, 'user_id');
     }
     
 }

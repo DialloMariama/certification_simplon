@@ -56,7 +56,7 @@ class ImageController extends Controller
      *              @OA\Schema(
      *                  type="object",
      *                  @OA\Property(
-     *                      property="image",
+     *                      property="image[]",
      *                      type="array",
      *                      @OA\Items(type="string", format="binary"),
      *                      description="Fichier image à téléverser",
@@ -69,7 +69,6 @@ class ImageController extends Controller
      *          description="Image ajoutée avec succès",
      *          @OA\JsonContent(
      *              @OA\Property(property="message", type="string", example="Image ajoutée avec succès"),
-     *              @OA\Property(property="image", type="object", ref="#/components/schemas/Image"),
      *          ),
      *      ),
      *      @OA\Response(

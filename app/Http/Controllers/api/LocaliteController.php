@@ -30,7 +30,6 @@ class LocaliteController extends Controller
      *          description="Liste de toutes les localités",
      *          @OA\JsonContent(
      *              @OA\Property(property="message", type="string", example="Liste de toutes les localités"),
-     *              @OA\Property(property="localite", type="array", @OA\Items(ref="#/components/schemas/Localite")),
      *          ),
      *      ),
      *      @OA\Response(
@@ -74,7 +73,6 @@ class LocaliteController extends Controller
      *          description="Localité enregistrée avec succès",
      *          @OA\JsonContent(
      *              @OA\Property(property="message", type="string", example="Localité enregistrée avec succès"),
-     *              @OA\Property(property="localite", ref="#/components/schemas/Localite"),
      *          ),
      *      ),
      *      @OA\Response(
@@ -109,7 +107,7 @@ class LocaliteController extends Controller
         if($validate->fails()){
             return response()->json([
                 'error' => $validate->errors()
-            ]);
+            ], 422);
         }
         $localite = Localite::create([
             'nomLocalite' => $request->nomLocalite,
@@ -150,7 +148,6 @@ class LocaliteController extends Controller
      *          description="Localité modifiée avec succès",
      *          @OA\JsonContent(
      *              @OA\Property(property="message", type="string", example="Localité modifiée avec succès"),
-     *              @OA\Property(property="localite", ref="#/components/schemas/Localite"),
      *          ),
      *      ),
      *      @OA\Response(
@@ -190,7 +187,7 @@ class LocaliteController extends Controller
         if($validate->fails()){
             return response()->json([
                 'error' => $validate->errors()
-            ]);
+            ], 422);
         }
         $localite->nomLocalite = $request->input('nomLocalite');
         $localite->commune = $request->input('commune');
