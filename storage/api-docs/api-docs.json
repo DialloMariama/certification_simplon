@@ -2448,7 +2448,7 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "image[]": {
+                                    "image": {
                                         "description": "Tableau d'images du logement",
                                         "type": "array",
                                         "items": {
@@ -2483,19 +2483,7 @@
                         "description": "Erreur de validation",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "errors": {
-                                            "type": "object",
-                                            "example": {
-                                                "adresse": [
-                                                    "Le champ adresse est obligatoire."
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
+                                "schema": {}
                             }
                         }
                     }

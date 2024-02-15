@@ -84,6 +84,7 @@ class AuthController extends Controller
                 'token' => $token,
                 'type' => 'bearer',
                 'message' => 'Vous vous êtes connecté avec succès',
+                'expires_in' => Auth::factory()->getTTL() * 60
             ],
         ]);
     }

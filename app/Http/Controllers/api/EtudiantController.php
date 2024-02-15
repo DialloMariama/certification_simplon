@@ -59,12 +59,12 @@ class EtudiantController extends Controller
         try {
             $user = new User();
             $validate= Validator::make($request->all(),[
-                'nom' => 'required|string|max:255',
-                'prenom' => 'required|string|max:255',
-                'adresse' => 'required|string|max:255',
+                'nom' => 'required|string|max:50',
+                'prenom' => 'required|string|max:70',
+                'adresse' => 'required|string|max:100',
                 'email' => 'required|string|email|max:255|unique:users,email',
-                'telephone' => 'nullable|string|regex:/^\+[0-9]+$/|unique:users|max:14',
-                'paysOrigine' => 'required|string|max:50',
+                'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|max:14',
+                'paysOrigine' => 'required|string|max:100',
                 'universite' => 'required|string|max:100',
             ]);
             if($validate->fails()){
@@ -92,7 +92,7 @@ class EtudiantController extends Controller
                 return response()->json([
                     "message" => "Etudiant enregistré avec succés",
                     "etudiant" => array_merge(array($etudiant), array($user))
-                ]);
+                ], 201);
             } else {
                 $user->delete();
                 return response()->json(["message" => "L'inscription a échoué"]);
