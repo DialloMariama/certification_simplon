@@ -59,13 +59,15 @@ class EtudiantController extends Controller
         try {
             $user = new User();
             $validate= Validator::make($request->all(),[
-                'nom' => 'required|string|max:50',
-                'prenom' => 'required|string|max:70',
-                'adresse' => 'required|string|max:100',
-                'email' => 'required|string|email|max:255|unique:users,email',
+                'nom' => 'required|string|min:2|max:50',
+                'prenom' => 'required|string|min:2|max:70',
+                'adresse' => 'required|string|min:2|max:100',
+                'email' => 'required|unique:users,email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
                 'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|max:14',
-                'paysOrigine' => 'required|string|max:100',
-                'universite' => 'required|string|max:100',
+                'paysOrigine' => 'required|string|min:2|max:100',
+                'universite' => 'required|string|min:2|max:100',
+                'password' => 'required|string|min:6|max:8',
+                'role' => 'required|string|in:etudiant',
             ]);
             if($validate->fails()){
                 return response()->json([
@@ -157,13 +159,13 @@ class EtudiantController extends Controller
             $user = Auth::user();
 
             $validate= Validator::make($request->all(),[
-                'nom' => 'required|string|max:255',
-                'prenom' => 'required|string|max:255',
-                'adresse' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-                'telephone' => 'nullable|string|regex:/^\+[0-9]+$/|unique:users|max:14',
-                'paysOrigine' => 'required|string|max:50',
-                'universite' => 'required|string|max:100',
+                'nom' => 'required|string|min:2|max:50',
+                'prenom' => 'required|string|min:2|max:70',
+                'adresse' => 'required|string|min:2|max:100',
+                'email' => 'required|unique:users,email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
+                'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|max:14',
+                'paysOrigine' => 'required|string|min:2|max:100',
+                'universite' => 'required|string|min:2|max:100',
             ]);
             if($validate->fails()){
                 return response()->json([

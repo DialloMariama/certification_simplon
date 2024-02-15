@@ -59,19 +59,22 @@ class ProprietaireController extends Controller
         try {
 
             $validate = Validator::make($request->all(), [
-                'nom' => 'required|string|max:255',
-                'prenom' => 'required|string|max:255',
-                'adresse' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:6',
-                'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|max:14',
+                'nom' => 'required|string|min:2|max:50',
+                'prenom' => 'required|string|min:3|max:70',
+                'adresse' => 'required|string|min:2|max:100',
+                'email' => 'required|unique:users,email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
+                'password' => 'required|string|min:6|max:8',
+                'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|min:9|max:14',
                 'role' => 'required|string|in:proprietaire',
             ]);
+            // dd($request->email);
+
             if ($validate->fails()) {
                 return response()->json([
                     'error' => $validate->errors()
                 ], 422);
             }
+            // dd($request->email);
 
 
             $user = new User();
@@ -154,11 +157,11 @@ class ProprietaireController extends Controller
             $user = Auth::user();
 
             $validate = Validator::make($request->all(), [
-                'nom' => 'required|string|max:255',
-                'prenom' => 'required|string|max:255',
-                'adresse' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-                'telephone' => 'nullable|string|regex:/^\+[0-9]+$/|unique:users|max:14',
+                'nom' => 'required|string|min:2|max:50',
+                'prenom' => 'required|string|min:3|max:70',
+                'adresse' => 'required|string|min:2|max:100',
+                'email' => 'required|unique:users,email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
+                'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|min:9|max:14',
             ]);
             if ($validate->fails()) {
                 return response()->json([
@@ -175,7 +178,7 @@ class ProprietaireController extends Controller
             $user->prenom = $request->input('prenom', $user->prenom);
             $user->email = $request->input('email', $user->email);
             $user->adresse = $request->input('adresse', $user->adresse);
-            $user->telephone = $request->input('telephone', $user->telephone);
+            $user->telephone = $request->input('telephone', $user->telephone); 
 
             if ($request->filled('password')) {
                 $user->password = Hash::make($request->password);
