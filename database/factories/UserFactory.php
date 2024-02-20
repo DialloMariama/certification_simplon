@@ -29,6 +29,7 @@ class UserFactory extends Factory
             'telephone' => ('+221774958197'),
             'role' => ('admin'),
             'adresse' => ('Médina'),
+            'inscriptionValidee' => 'valider',
             'email' => ('maridiallo@gmail.com'),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),

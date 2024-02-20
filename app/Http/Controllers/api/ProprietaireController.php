@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\LogementRessource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -27,55 +28,56 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class ProprietaireController extends Controller
 {
     /**
-     * @OA\Post(
-     *     path="/api/inscriptionProprietaire",
-     *     summary="Enregistrer un nouveau proprietaire",
-     *     tags={"Propriétaires"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"nom", "prenom", "adresse", "telephone", "email", "password", "role"},
-     *             @OA\Property(property="nom", type="string"),
-     *             @OA\Property(property="prenom", type="string"),
-     *             @OA\Property(property="telephone", type="string"),
-     *             @OA\Property(property="email", type="string"),
-     *             @OA\Property(property="password", type="string"),
-     *              @OA\Property(property="adresse", type="string", example="Adresse"),
-     *             @OA\Property(property="role", type="string")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="User created successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string"),
-     *             @OA\Property(property="user", type="object")
-     *         )
-     *     )
-     * )
-     */
+ * @OA\Post(
+ *     path="/api/inscriptionProprietaire",
+ *     summary="Enregistrer un nouveau propriétaire",
+ *     tags={"Propriétaires"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 required={"nom", "prenom", "adresse", "telephone", "email", "password", "role", "papierJustificatif"},
+ *                 @OA\Property(property="nom", type="string"),
+ *                 @OA\Property(property="prenom", type="string"),
+ *                 @OA\Property(property="adresse", type="string", example="Adresse"),
+ *                 @OA\Property(property="telephone", type="string"),
+ *                 @OA\Property(property="email", type="string"),
+ *                 @OA\Property(property="password", type="string"),
+ *                 @OA\Property(property="role", type="string"),
+ *                 @OA\Property(property="papierJustificatif", type="file", format="file")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User created successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string"),
+ *             @OA\Property(property="proprietaire", type="object")
+ *         )
+ *     )
+ * )
+ */
+
     public function registerProprietaire(Request $request)
     {
         try {
-
             $validate = Validator::make($request->all(), [
-                'nom' => 'required|string|min:2|max:50',
-                'prenom' => 'required|string|min:3|max:70',
-                'adresse' => 'required|string|min:2|max:100',
+                'nom' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:50',
+                'prenom' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:50',
+                'adresse' => 'required|string|min:2|max:100|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ0-9 -]*$/',
                 'email' => 'required|unique:users,email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
                 'password' => 'required|string|min:6|max:8',
-                'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|min:9|max:14',
+                'telephone' => 'required|string|regex:/^[0-9]+$/|unique:users|max:14',
                 'role' => 'required|string|in:proprietaire',
+                'papierJustificatif' => 'required|file|max:2048',
             ]);
-            // dd($request->email);
-
             if ($validate->fails()) {
                 return response()->json([
                     'error' => $validate->errors()
                 ], 422);
             }
-            // dd($request->email);
-
 
             $user = new User();
             $proprietaire = new Proprietaire();
@@ -88,13 +90,18 @@ class ProprietaireController extends Controller
             $user->adresse = $request->input('adresse');
             $user->password = Hash::make($request->password);
 
+            if ($request->hasFile('papierJustificatif')) {
+                $actePath = $request->file('papierJustificatif')->store('papier_Justificatif', 'public');
+                $user->papierJustificatif = $actePath;
+            }
+
             $user->save();
             $proprietaire->user_id = $user->id;
 
             if ($proprietaire->save()) {
                 return response()->json([
-                    "message" => "Propriétaire enregistré avec succés",
-                    "proprietaire" => array_merge(array($proprietaire), array($user))
+                    "message" => "Propriétaire enregistré avec succès",
+                    "proprietaire" => array_merge($proprietaire->toArray(), $user->toArray())
                 ]);
             } else {
                 $user->delete();
@@ -107,49 +114,55 @@ class ProprietaireController extends Controller
         }
     }
 
-    /**
-     * @OA\Put(
-     *      path="/api/updateProprietaire",
-     *      operationId="updateProprietaire",
-     *      tags={"Propriétaires"},
-     *      summary="Mise à jour des informations du propriétaire",
-     *      description="Permet au propriétaire de mettre à jour ses informations personnelles.",
-     *      @OA\RequestBody(
-     *          required=true,
-     *          description="Données à mettre à jour",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="nom", type="string", example="Nom"),
-     *              @OA\Property(property="prenom", type="string", example="Prénom"),
-     *              @OA\Property(property="adresse", type="string", example="Adresse"),
-     *              @OA\Property(property="email", type="string", example="proprietaire@example.com"),
-     *              @OA\Property(property="telephone", type="string", example="+1234567890"),
-     *              @OA\Property(property="password", type="string", example="nouveauMotDePasse"),
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Informations mises à jour avec succès.",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="message", type="string", example="Informations mises à jour avec succès"),
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Propriétaire non trouvé.",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="error", type="string", example="Propriétaire non trouvé"),
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=500,
-     *          description="Une erreur s'est produite.",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="error", type="string", example="Une erreur s'est produite"),
-     *          ),
-     *      ),
-     *      security={{"bearerAuth": {}}},
-     * )
-     */
+   /**
+ * @OA\Put(
+ *      path="/api/updateProprietaire",
+ *      operationId="updateProprietaire",
+ *      tags={"Propriétaires"},
+ *      summary="Mise à jour des informations du propriétaire",
+ *      description="Permet au propriétaire de mettre à jour ses informations personnelles.",
+ *      @OA\RequestBody(
+ *          required=true,
+ *          description="Données à mettre à jour",
+ *          @OA\MediaType(
+ *              mediaType="multipart/form-data",
+ *              @OA\Schema(
+ *                  required={"nom", "prenom", "adresse", "telephone", "email", "password", "papierJustificatif"},
+ *                  @OA\Property(property="nom", type="string", example="Nom"),
+ *                  @OA\Property(property="prenom", type="string", example="Prénom"),
+ *                  @OA\Property(property="adresse", type="string", example="Adresse"),
+ *                  @OA\Property(property="email", type="string", example="proprietaire@example.com"),
+ *                  @OA\Property(property="telephone", type="string", example="1234567890"),
+ *                  @OA\Property(property="password", type="string", example="nouveauMotDePasse"),
+ *                  @OA\Property(property="papierJustificatif", type="file", format="file")
+ *              )
+ *          )
+ *      ),
+ *      @OA\Response(
+ *          response=200,
+ *          description="Informations mises à jour avec succès.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="Informations mises à jour avec succès"),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=404,
+ *          description="Propriétaire non trouvé.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="error", type="string", example="Propriétaire non trouvé"),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=500,
+ *          description="Une erreur s'est produite.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="error", type="string", example="Une erreur s'est produite"),
+ *          ),
+ *      ),
+ *      security={{"bearerAuth": {}}},
+ * )
+ */
+
 
     public function updateProprietaire(Request $request)
     {
@@ -157,11 +170,12 @@ class ProprietaireController extends Controller
             $user = Auth::user();
 
             $validate = Validator::make($request->all(), [
-                'nom' => 'required|string|min:2|max:50',
-                'prenom' => 'required|string|min:3|max:70',
-                'adresse' => 'required|string|min:2|max:100',
-                'email' => 'required|unique:users,email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
-                'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|min:9|max:14',
+                'nom' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:50',
+                'prenom' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:50',
+                'adresse' => 'required|string|min:2|max:100|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ0-9 -]*$/',
+                'email' => 'required|email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
+                'telephone' => 'required|string|regex:/^[0-9]+$/||min:9|max:14',
+                'papierJustificatif' => 'required|file|max:2048',
             ]);
             if ($validate->fails()) {
                 return response()->json([
@@ -178,12 +192,17 @@ class ProprietaireController extends Controller
             $user->prenom = $request->input('prenom', $user->prenom);
             $user->email = $request->input('email', $user->email);
             $user->adresse = $request->input('adresse', $user->adresse);
-            $user->telephone = $request->input('telephone', $user->telephone); 
+            $user->telephone = $request->input('telephone', $user->telephone);
 
             if ($request->filled('password')) {
                 $user->password = Hash::make($request->password);
             }
-
+            if ($request->hasFile('papierJustificatif')) {
+                if ($user->papierJustificatif) {
+                    Storage::delete($user->papierJustificatif);
+                }
+                $user->papierJustificatif = $request->file('papierJustificatif')->store('papier_Justificatif', 'public');
+            }
             if ($user->save() && $proprietaire->save()) {
                 return response()->json([
                     "message" => 'Informations mises à jour avec succès',

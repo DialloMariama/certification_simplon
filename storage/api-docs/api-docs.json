@@ -1471,7 +1471,7 @@
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "required": [
                                     "nom",
@@ -1482,7 +1482,8 @@
                                     "password",
                                     "paysOrigine",
                                     "universite",
-                                    "role"
+                                    "role",
+                                    "papierJustificatif"
                                 ],
                                 "properties": {
                                     "nom": {
@@ -1511,6 +1512,10 @@
                                     },
                                     "role": {
                                         "type": "string"
+                                    },
+                                    "papierJustificatif": {
+                                        "type": "file",
+                                        "format": "file"
                                     }
                                 },
                                 "type": "object"
@@ -1552,8 +1557,19 @@
                     "description": "Données à mettre à jour",
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom",
+                                    "adresse",
+                                    "telephone",
+                                    "email",
+                                    "paysOrigine",
+                                    "universite",
+                                    "password",
+                                    "papierJustificatif"
+                                ],
                                 "properties": {
                                     "nom": {
                                         "type": "string",
@@ -1586,6 +1602,10 @@
                                     "password": {
                                         "type": "string",
                                         "example": "nouveauMotDePasse"
+                                    },
+                                    "papierJustificatif": {
+                                        "type": "file",
+                                        "format": "file"
                                     }
                                 },
                                 "type": "object"
@@ -2410,46 +2430,34 @@
                                 ],
                                 "properties": {
                                     "adresse": {
-                                        "description": "Adresse du logement",
                                         "type": "string"
                                     },
                                     "type": {
-                                        "description": "Type de logement",
                                         "type": "string"
                                     },
                                     "disponibilite": {
-                                        "description": "Date de disponibilité du logement",
                                         "type": "string",
                                         "format": "date"
                                     },
                                     "description": {
-                                        "description": "Description du logement",
                                         "type": "string"
                                     },
                                     "superficie": {
-                                        "description": "Superficie du logement",
-                                        "type": "numeric"
+                                        "type": "number"
                                     },
                                     "prix": {
-                                        "description": "Prix du logement",
-                                        "type": "numeric"
+                                        "type": "number"
                                     },
                                     "nombreChambre": {
-                                        "description": "Nombre de chambres du logement",
-                                        "type": "integer",
-                                        "minimum": 1
+                                        "type": "integer"
                                     },
                                     "equipements": {
-                                        "description": "Équipements du logement",
                                         "type": "string"
                                     },
                                     "localite_id": {
-                                        "description": "ID de la localité associée",
-                                        "type": "integer",
-                                        "example": 1
+                                        "type": "integer"
                                     },
-                                    "image": {
-                                        "description": "Tableau d'images du logement",
+                                    "image[]": {
                                         "type": "array",
                                         "items": {
                                             "type": "string",
@@ -2565,7 +2573,7 @@
             }
         },
         "/api/logements/{id}": {
-            "put": {
+            "post": {
                 "tags": [
                     "Logements"
                 ],
@@ -2617,9 +2625,6 @@
                                     },
                                     "localite_id": {
                                         "type": "integer"
-                                    },
-                                    "remplacer_images": {
-                                        "type": "boolean"
                                     },
                                     "image[]": {
                                         "type": "array",
@@ -3039,12 +3044,12 @@
                 "tags": [
                     "Propriétaires"
                 ],
-                "summary": "Enregistrer un nouveau proprietaire",
+                "summary": "Enregistrer un nouveau propriétaire",
                 "operationId": "a9fc7f4f52b935922a32a0feafe8a433",
                 "requestBody": {
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "required": [
                                     "nom",
@@ -3053,7 +3058,8 @@
                                     "telephone",
                                     "email",
                                     "password",
-                                    "role"
+                                    "role",
+                                    "papierJustificatif"
                                 ],
                                 "properties": {
                                     "nom": {
@@ -3061,6 +3067,10 @@
                                     },
                                     "prenom": {
                                         "type": "string"
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "Adresse"
                                     },
                                     "telephone": {
                                         "type": "string"
@@ -3071,12 +3081,12 @@
                                     "password": {
                                         "type": "string"
                                     },
-                                    "adresse": {
-                                        "type": "string",
-                                        "example": "Adresse"
-                                    },
                                     "role": {
                                         "type": "string"
+                                    },
+                                    "papierJustificatif": {
+                                        "type": "file",
+                                        "format": "file"
                                     }
                                 },
                                 "type": "object"
@@ -3094,7 +3104,7 @@
                                         "message": {
                                             "type": "string"
                                         },
-                                        "user": {
+                                        "proprietaire": {
                                             "type": "object"
                                         }
                                     },
@@ -3118,8 +3128,17 @@
                     "description": "Données à mettre à jour",
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom",
+                                    "adresse",
+                                    "telephone",
+                                    "email",
+                                    "password",
+                                    "papierJustificatif"
+                                ],
                                 "properties": {
                                     "nom": {
                                         "type": "string",
@@ -3139,11 +3158,15 @@
                                     },
                                     "telephone": {
                                         "type": "string",
-                                        "example": "+1234567890"
+                                        "example": "1234567890"
                                     },
                                     "password": {
                                         "type": "string",
                                         "example": "nouveauMotDePasse"
+                                    },
+                                    "papierJustificatif": {
+                                        "type": "file",
+                                        "format": "file"
                                     }
                                 },
                                 "type": "object"

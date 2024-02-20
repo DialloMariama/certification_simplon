@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('password');
             $table->enum('role', ['admin','proprietaire','etudiant']);
             $table->boolean('etat')->default(true);
+            $table->enum('inscriptionValidee',['enAttente','valider','rejeter'])->default('enAttente');
+            $table->string('papierJustificatif')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

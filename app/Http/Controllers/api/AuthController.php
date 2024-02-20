@@ -63,8 +63,8 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password) || !$user->etat) {
-            return response()->json(['message' => 'Vous n\'êtes pas autorisé à effectuer cette action car les informations d\'identification sont incorrectes ou le compte est désactivé'], 401);
+        if (!$user || !Hash::check($request->password, $user->password) || !$user->etat || $user->inscriptionValidee !== 'valider') {
+            return response()->json(['message' => 'Votre compte est désactivé ou votre inscription est en attente de validation'], 401);
         }
 
         $token = Auth::attempt($credentials);
@@ -453,5 +453,33 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json(["message" => "Une erreur s'est produite"], 500);
         }
+    }
+
+
+    public function validerInscription($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        if ($user && !$user->inscription_validee) {
+            $user->inscriptionValidee = 'valider';
+            $user->save();
+
+            return response()->json(['message' => 'Inscription validée avec succès.'], 200);
+        }
+
+        return response()->json(['message' => 'L\'utilisateur n\'existe pas ou son inscription est déjà validée.'], 404);
+    }
+    public function rejeterInscription($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        if ($user && !$user->inscription_validee) {
+            $user->inscriptionValidee = 'rejeter';
+            $user->save();
+
+            return response()->json(['message' => 'Inscription rejetée avec succès.'], 200);
+        }
+
+        return response()->json(['message' => 'L\'utilisateur n\'existe pas ou son inscription est déjà rejetée.'], 404);
     }
 }

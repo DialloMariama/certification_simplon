@@ -48,7 +48,6 @@ Route::middleware('auth:api', 'user')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('detailAnnonce/{id}', [AnnonceController::class, 'show']);
     Route::post('gmail.proprietaire/{id}', [LogementController::class, 'redirigerGmail']);
-
 });
 
 Route::middleware('auth:api', 'admin')->group(function () {
@@ -62,6 +61,8 @@ Route::middleware('auth:api', 'admin')->group(function () {
     Route::post('ajoutLocalites', [LocaliteController::class, 'store']);
     Route::get('localites', [LocaliteController::class, 'index']);
     Route::put('localites/{id}', [LocaliteController::class, 'update']);
+    Route::put('validerInscription/{userId}', [AuthController::class, 'validerInscription']);
+    Route::put('rejeterInscription/{userId}', [AuthController::class, 'rejeterInscription']);
     Route::delete('localites/{id}', [LocaliteController::class, 'destroy']);
     Route::get('logementsAdmin', [LogementController::class, 'index']);
     Route::delete('supprimerCommentaires/{id}', [CommentaireController::class, 'destroyByAdmin']);
@@ -78,13 +79,12 @@ Route::middleware('auth:api', 'etudiant')->group(function () {
     Route::delete('annonces/{id}', [AnnonceController::class, 'destroy']);
     Route::put('marquerPrisEncharge/{id}', [AnnonceController::class, 'marquerPriseEnCharge']);
     Route::get('AnnonceEtudiant', [EtudiantController::class, 'indexEtudiant']);
-
 });
 
 Route::middleware('auth:api', 'proprietaire')->group(function () {
     Route::put('updateProprietaire', [ProprietaireController::class, 'updateProprietaire']);
     Route::post('ajoutLogements', [LogementController::class, 'store']);
-    Route::put('logements/{id}', [LogementController::class, 'update']);
+    Route::post('logements/{id}', [LogementController::class, 'update']);
     Route::delete('logements/{id}', [LogementController::class, 'destroy']);
     Route::get('logementsProprietaire', [ProprietaireController::class, 'index']);
     Route::post('ajoutImage/{id}', [ImageController::class, 'addImage']);

@@ -90,50 +90,49 @@ class LogementController extends Controller
      */
 
     /**
-     * @OA\Post(
-     *      path="/api/ajoutLogements",
-     *      operationId="createLogement",
-     *      tags={"Logements"},
-     *      summary="Créer un nouveau logement",
-     *      description="Crée un nouveau logement avec les détails fournis.",
-     *      @OA\RequestBody(
-     *          required=true,
-     *          description="Données du logement",
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  required={"adresse", "type", "disponibilite", "description", "superficie", "prix", "equipements", "localite_id", "image"},
-     *                  @OA\Property(property="adresse", type="string", description="Adresse du logement"),
-     *                  @OA\Property(property="type", type="string", description="Type de logement"),
-     *                  @OA\Property(property="disponibilite", type="date", description="Date de disponibilité du logement"),
-     *                  @OA\Property(property="description", type="string", description="Description du logement"),
-     *                  @OA\Property(property="superficie", type="numeric", description="Superficie du logement"),
-     *                  @OA\Property(property="prix", type="numeric", description="Prix du logement"),
-     *                  @OA\Property(property="nombreChambre", type="integer", description="Nombre de chambres du logement", minimum=1),
-     *                  @OA\Property(property="equipements", type="string", description="Équipements du logement"),
-     *                  @OA\Property(property="localite_id", type="integer", description="ID de la localité associée", example=1),
-     *                  @OA\Property(property="image", type="array", description="Tableau d'images du logement",
-     *                      @OA\Items(type="string", format="binary"),
-     *                  ),
-     *              )
-     *          )
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Logement enregistré avec succès",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="message", type="string", example="Logement enregistré avec succès"),
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=422,
-     *          description="Erreur de validation",
-     *          @OA\JsonContent(
-     *          ),
-     *      ),
-     *      security={{"bearerAuth": {}}},
-     * )
-     */
+ * @OA\Post(
+ *      path="/api/ajoutLogements",
+ *      operationId="createLogement",
+ *      tags={"Logements"},
+ *      summary="Créer un nouveau logement",
+ *      description="Crée un nouveau logement avec les détails fournis.",
+ *      @OA\RequestBody(
+ *          required=true,
+ *          description="Données du logement",
+ *          @OA\MediaType(
+ *              mediaType="multipart/form-data",
+ *              @OA\Schema(
+ *                  required={"adresse", "type", "disponibilite", "description", "superficie", "prix", "equipements", "localite_id", "image"},
+ *                  @OA\Property(property="adresse", type="string"),
+ *                  @OA\Property(property="type", type="string"),
+ *                  @OA\Property(property="disponibilite", type="string", format="date"),
+ *                  @OA\Property(property="description", type="string"),
+ *                  @OA\Property(property="superficie", type="number"),
+ *                  @OA\Property(property="prix", type="number"),
+ *                  @OA\Property(property="nombreChambre", type="integer"),
+ *                  @OA\Property(property="equipements", type="string"),
+ *                  @OA\Property(property="localite_id", type="integer"),
+ *                  @OA\Property(property="image[]", type="array", @OA\Items(type="string", format="binary")),
+ *              ),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=200,
+ *          description="Logement enregistré avec succès",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="Logement enregistré avec succès"),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=422,
+ *          description="Erreur de validation",
+ *          @OA\JsonContent(
+ *          ),
+ *      ),
+ *      security={{"bearerAuth": {}}},
+ * )
+ */
+
 
     public function store(Request $request)
     {
@@ -268,7 +267,7 @@ class LogementController extends Controller
      */
 
     /**
-     * @OA\Put(
+     * @OA\Post(
      *      path="/api/logements/{id}",
      *      operationId="updateLogement",
      *      tags={"Logements"},
@@ -295,7 +294,6 @@ class LogementController extends Controller
      *                  @OA\Property(property="nombreChambre", type="integer"),
      *                  @OA\Property(property="equipements", type="string"),
      *                  @OA\Property(property="localite_id", type="integer"),
-     *                  @OA\Property(property="remplacer_images", type="boolean"),
      *                  @OA\Property(property="image[]", type="array", @OA\Items(type="string", format="binary")),
      *              ),
      *          ),
@@ -389,7 +387,7 @@ class LogementController extends Controller
 
                 foreach ($images as $image) {
                     Storage::disk('public')->delete($image->nomImage);
-                    $images->delete();
+                    // $images->delete();
                 }
 
                 foreach ($request->file('image') as $file) {
@@ -402,10 +400,11 @@ class LogementController extends Controller
             }
 
             if ($logement->save()) {
+                $logement->images;
                 return response()->json([
                     "message" => "Logement mis à jour avec succès",
                     "logement" => $logement,
-                    "images" => $logement->images
+                    // "images" => $logement->images
                 ]);
             } else {
                 return response()->json(["message" => "La mise à jour du logement a échoué"]);

@@ -10,6 +10,7 @@ class Proprietaire extends Model
     use HasFactory;
     protected $fillable = [
         'user_id',
+        'actePropriete',
     ];
 
     public function user() 

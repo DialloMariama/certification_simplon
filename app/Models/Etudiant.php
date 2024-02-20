@@ -13,6 +13,8 @@ class Etudiant extends Model
         'user_id',
         'paysOrigine',
         'universite',
+        'diplomeCertificat',
+
     ];
 
     public function user()

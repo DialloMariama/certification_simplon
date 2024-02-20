@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\AnnonceRessource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\AnnonceDetailRessource;
@@ -24,52 +25,57 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 class EtudiantController extends Controller
 {
     /**
-     * @OA\Post(
-     *     path="/api/inscriptionEtudiant",
-     *     summary="Enregistrer un nouveau etudiant",
-     *     tags={"Etudiants"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"nom", "prenom", "adresse", "telephone", "email", "password", "paysOrigine", "universite", "role"},
-     *             @OA\Property(property="nom", type="string"),
-     *             @OA\Property(property="prenom", type="string"),
-     *             @OA\Property(property="telephone", type="string"),
-     *             @OA\Property(property="email", type="string"),
-     *             @OA\Property(property="password", type="string"),
-     *             @OA\Property(property="paysOrigine", type="string"),
-     *             @OA\Property(property="universite", type="string"),
-     *             @OA\Property(property="adresse", type="string"),
-     *             @OA\Property(property="role", type="string")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="User created successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string"),
-     *             @OA\Property(property="user", type="object")
-     *         )
-     *     )
-     * )
-     */
+ * @OA\Post(
+ *     path="/api/inscriptionEtudiant",
+ *     summary="Enregistrer un nouveau etudiant",
+ *     tags={"Etudiants"},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 required={"nom", "prenom", "adresse", "telephone", "email", "password", "paysOrigine", "universite", "role", "papierJustificatif"},
+ *                 @OA\Property(property="nom", type="string"),
+ *                 @OA\Property(property="prenom", type="string"),
+ *                 @OA\Property(property="telephone", type="string"),
+ *                 @OA\Property(property="email", type="string"),
+ *                 @OA\Property(property="password", type="string"),
+ *                 @OA\Property(property="paysOrigine", type="string"),
+ *                 @OA\Property(property="universite", type="string"),
+ *                 @OA\Property(property="adresse", type="string"),
+ *                 @OA\Property(property="role", type="string"),
+ *                 @OA\Property(property="papierJustificatif", type="file", format="file")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="User created successfully",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string"),
+ *             @OA\Property(property="user", type="object")
+ *         )
+ *     )
+ * )
+ */
+
     public function registerEtudiant(Request $request)
     {
-        // dd($request->all());
         try {
             $user = new User();
-            $validate= Validator::make($request->all(),[
-                'nom' => 'required|string|min:2|max:50',
-                'prenom' => 'required|string|min:2|max:70',
-                'adresse' => 'required|string|min:2|max:100',
+            $validate = Validator::make($request->all(), [
+                'nom' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:50',
+                'prenom' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:50',
+                'adresse' => 'required|string|min:2|max:100|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ0-9 -]*$/',
                 'email' => 'required|unique:users,email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
-                'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|max:14',
-                'paysOrigine' => 'required|string|min:2|max:100',
-                'universite' => 'required|string|min:2|max:100',
+                'telephone' => 'required|string|regex:/^[0-9]+$/|unique:users|max:14',
+                'paysOrigine' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:100',
+                'universite' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:100',
                 'password' => 'required|string|min:6|max:8',
+                'papierJustificatif' => 'required|file|max:2048',
                 'role' => 'required|string|in:etudiant',
             ]);
-            if($validate->fails()){
+            if ($validate->fails()) {
                 return response()->json([
                     'error' => $validate->errors()
                 ], 422);
@@ -84,6 +90,11 @@ class EtudiantController extends Controller
             $user->adresse = $request->input('adresse');
             $user->password = Hash::make($request->password);
 
+            if ($request->hasFile('papierJustificatif')) {
+                $diplomePath = $request->file('papierJustificatif')->store('papier_Justificatif', 'public');
+                $user->papierJustificatif = $diplomePath;
+            }
+
             $user->save();
 
             $etudiant->paysOrigine  = $request->input('paysOrigine');
@@ -92,8 +103,8 @@ class EtudiantController extends Controller
 
             if ($etudiant->save()) {
                 return response()->json([
-                    "message" => "Etudiant enregistré avec succés",
-                    "etudiant" => array_merge(array($etudiant), array($user))
+                    "message" => "Etudiant enregistré avec succès",
+                    "etudiant" => array_merge($etudiant->toArray(), $user->toArray())
                 ], 201);
             } else {
                 $user->delete();
@@ -106,51 +117,58 @@ class EtudiantController extends Controller
         }
     }
 
-    /**
-     * @OA\Put(
-     *      path="/api/updateEtudiant",
-     *      operationId="updateEtudiant",
-     *      tags={"Etudiants"},
-     *      summary="Mise à jour des informations de l'étudiant",
-     *      description="Permet à l'étudiant de mettre à jour ses informations personnelles.",
-     *      @OA\RequestBody(
-     *          required=true,
-     *          description="Données à mettre à jour",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="nom", type="string", example="Nom"),
-     *              @OA\Property(property="prenom", type="string", example="Prénom"),
-     *              @OA\Property(property="adresse", type="string", example="Adresse"),
-     *              @OA\Property(property="email", type="string", example="etudiant@example.com"),
-     *              @OA\Property(property="telephone", type="string", example="+2217700000"),
-     *              @OA\Property(property="paysOrigine", type="string", example="Pays d'origine"),
-     *              @OA\Property(property="universite", type="string", example="Nom de l'université"),
-     *              @OA\Property(property="password", type="string", example="nouveauMotDePasse"),
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=200,
-     *          description="Informations mises à jour avec succès.",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="message", type="string", example="Informations mises à jour avec succès"),
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Étudiant non trouvé.",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="error", type="string", example="Étudiant non trouvé"),
-     *          ),
-     *      ),
-     *      @OA\Response(
-     *          response=500,
-     *          description="Une erreur s'est produite.",
-     *          @OA\JsonContent(
-     *              @OA\Property(property="error", type="string", example="Une erreur s'est produite"),
-     *          ),
-     *      ),
-     *      security={{"bearerAuth": {}}},
-     * )
-     */
+
+/**
+ * @OA\Put(
+ *      path="/api/updateEtudiant",
+ *      operationId="updateEtudiant",
+ *      tags={"Etudiants"},
+ *      summary="Mise à jour des informations de l'étudiant",
+ *      description="Permet à l'étudiant de mettre à jour ses informations personnelles.",
+ *      @OA\RequestBody(
+ *          required=true,
+ *          description="Données à mettre à jour",
+ *          @OA\MediaType(
+ *              mediaType="multipart/form-data",
+ *              @OA\Schema(
+ *                  required={"nom", "prenom", "adresse", "telephone", "email", "paysOrigine", "universite", "password", "papierJustificatif"},
+ *                  @OA\Property(property="nom", type="string", example="Nom"),
+ *                  @OA\Property(property="prenom", type="string", example="Prénom"),
+ *                  @OA\Property(property="adresse", type="string", example="Adresse"),
+ *                  @OA\Property(property="email", type="string", example="etudiant@example.com"),
+ *                  @OA\Property(property="telephone", type="string", example="+2217700000"),
+ *                  @OA\Property(property="paysOrigine", type="string", example="Pays d'origine"),
+ *                  @OA\Property(property="universite", type="string", example="Nom de l'université"),
+ *                  @OA\Property(property="password", type="string", example="nouveauMotDePasse"),
+ *                  @OA\Property(property="papierJustificatif", type="file", format="file")
+ *              )
+ *          )
+ *      ),
+ *      @OA\Response(
+ *          response=200,
+ *          description="Informations mises à jour avec succès.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="Informations mises à jour avec succès"),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=404,
+ *          description="Étudiant non trouvé.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="error", type="string", example="Étudiant non trouvé"),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=500,
+ *          description="Une erreur s'est produite.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="error", type="string", example="Une erreur s'est produite"),
+ *          ),
+ *      ),
+ *      security={{"bearerAuth": {}}},
+ * )
+ */
+
 
 
     public function updateEtudiant(Request $request)
@@ -158,16 +176,17 @@ class EtudiantController extends Controller
         try {
             $user = Auth::user();
 
-            $validate= Validator::make($request->all(),[
-                'nom' => 'required|string|min:2|max:50',
-                'prenom' => 'required|string|min:2|max:70',
-                'adresse' => 'required|string|min:2|max:100',
-                'email' => 'required|unique:users,email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
-                'telephone' => 'required|string|regex:/^\+[0-9]+$/|unique:users|max:14',
-                'paysOrigine' => 'required|string|min:2|max:100',
-                'universite' => 'required|string|min:2|max:100',
+            $validate = Validator::make($request->all(), [
+                'nom' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:50',
+                'prenom' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:50',
+                'adresse' => 'required|string|min:2|max:100|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ0-9 -]*$/',
+                'email' => 'required|email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
+                'telephone' => 'required|string|regex:/^[0-9]+$/|min:9|max:14',
+                'paysOrigine' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:100',
+                'universite' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:100',
+                'papierJustificatif' => 'nullable|file|max:2048',
             ]);
-            if($validate->fails()){
+            if ($validate->fails()) {
                 return response()->json([
                     'error' => $validate->errors()
                 ], 422);
@@ -192,6 +211,13 @@ class EtudiantController extends Controller
                 $user->password = Hash::make($request->password);
             }
 
+            if ($request->hasFile('papierJustificatif')) {
+                if ($user->papierJustificatif) {
+                    Storage::delete($user->papierJustificatif);
+                }
+                $user->papierJustificatif = $request->file('papierJustificatif')->store('papier_Justificatif', 'public');
+            }
+
             if ($user->save() && $etudiant->save()) {
                 return response()->json([
                     "message" => 'Informations mises à jour avec succès',
@@ -204,11 +230,12 @@ class EtudiantController extends Controller
         }
     }
 
+
     /**
      * Display a listing of the resource.
      */
 
-     /**
+    /**
      * @OA\Get(
      *      path="/api/AnnonceEtudiant",
      *      operationId="getEtudiantAnnonces",
@@ -243,22 +270,21 @@ class EtudiantController extends Controller
      */
     public function indexEtudiant()
     {
-       
-            try {
+
+        try {
             $user = Auth::user();
             $etudiant = Etudiant::where('user_id', $user->id)->first();
-    
+
             $annonce = Annonce::where('etudiant_id', $etudiant->id)->get();
 
-                return response()->json([
-                    AnnonceDetailRessource::collection($annonce),
-                ]);
-            } catch (ModelNotFoundException $e) {
-                return response()->json(["message" => "Annonce non trouvé"], 404);
-            } catch (\Exception $e) {
-                return response()->json(["message" => "Une erreur s'est produite"], 500);
-            }
-        
+            return response()->json([
+                AnnonceDetailRessource::collection($annonce),
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(["message" => "Annonce non trouvé"], 404);
+        } catch (\Exception $e) {
+            return response()->json(["message" => "Une erreur s'est produite"], 500);
+        }
     }
 
 
