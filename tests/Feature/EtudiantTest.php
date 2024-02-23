@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Etudiant;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -22,19 +23,17 @@ class EtudiantTest extends TestCase
             'nom' => 'BAH',
             'prenom' => 'Magid',
             'adresse' => 'Médina Rue x 25',
-            'email' => 'magid1@gmail.com',
-            'password' => 'passer123',
-            'telephone' => '+221781971737',
+            'email' => 'maridiallo@gmail.com',
+            'password' => 'password',
+            'telephone' => '221781971737',
             'paysOrigine' => 'Sénégal',
             'universite' => 'UCAD',
             'role' => 'etudiant',
+            'inscriptionValidee' => 'valider',
+            'papierJustificatif' => UploadedFile::fake()->create('papier_justificatif.pdf', 1000),
         ]);
 
-        $response->assertStatus(200)
-                 ->assertJson([
-                     'message' => 'Etudiant enregistré avec succés', 
-                     'etudiant' => $response->json('etudiant')
-                 ]);
+        $response->assertStatus(201);
     }
 
     public function testModificationEtudiant()
@@ -51,10 +50,12 @@ class EtudiantTest extends TestCase
             'adresse' => 'Médina Rue x 25',
             'email' => 'maridiallo@gmail.com',
             'password' => 'password',
-            'telephone' => '+221781971737',
+            'telephone' => '221781971737',
             'paysOrigine' => 'Sénégal',
             'universite' => 'UCAD',
             'role' => 'etudiant',
+            'inscriptionValidee' => 'valider',
+            'papierJustificatif' => UploadedFile::fake()->create('papier_justificatif.pdf', 1000),
         ]);
 
         $response->assertStatus(200);

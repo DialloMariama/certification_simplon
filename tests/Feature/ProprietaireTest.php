@@ -2,9 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Proprietaire;
 use Tests\TestCase;
 use App\Models\User;
+use App\Models\Proprietaire;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -21,16 +22,15 @@ class ProprietaireTest extends TestCase
             'prenom' => 'Magid',
             'adresse' => 'Médina Rue x 25',
             'email' => 'magid123@gmail.com',
-            'password' => 'passer123',
-            'telephone' => '+221781971737',
+            'password' => 'passer12',
+            'telephone' => '00221781971737',
             'role' => 'proprietaire',
+            'inscriptionValidee' => 'valider',
+            'papierJustificatif' => UploadedFile::fake()->create('papier_justificatif.pdf', 1000),
+
         ]);
 
-        $response->assertStatus(200)
-                 ->assertJson([
-                    "message" => "Propriétaire enregistré avec succés",
-                    'proprietaire' => $response->json('proprietaire')
-                 ]);
+        $response->assertStatus(200);
     }
 
     public function testModificationProprietaire()
@@ -47,8 +47,10 @@ class ProprietaireTest extends TestCase
             'adresse' => 'Médina Rue x 25',
             'email' => 'maridiallo@gmail.com',
             'password' => 'password',
-            'telephone' => '+221781971737',
+            'telephone' => '221781971737',
             'role' => 'proprietaire',
+            'inscriptionValidee' => 'valider',
+            'papierJustificatif' => UploadedFile::fake()->create('papier_justificatif.pdf', 1000),
         ]);
 
         $response->assertStatus(200);

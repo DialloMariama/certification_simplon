@@ -7,6 +7,7 @@ use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\api\AuthController;
 use App\Http\Controllers\api\EtudiantController;
@@ -104,12 +105,14 @@ class UserTest extends TestCase
             'nom' => 'BAH',
             'prenom' => 'Magid',
             'adresse' => 'Médina Rue x 25',
-            'email' => 'magid12@gmail.com',
-            'password' => 'passer123',
-            'telephone' => '+221781971737',
+            'email' => 'magid1012@gmail.com',
+            'password' => 'passer12',
+            'telephone' => '00221781970738',
             'paysOrigine' => 'Sénégal',
             'universite' => 'UCAD',
             'role' => 'etudiant',
+            'inscriptionValidee' => 'valider',
+            'papierJustificatif' => UploadedFile::fake()->create('papier_justificatif.pdf', 1000),
         ]);
     
         // Déclenchez la validation et remplissez les données validées
@@ -117,12 +120,12 @@ class UserTest extends TestCase
     
         $response = $etudiantController->registerEtudiant($storeEtudiantRequest);
         $this->assertInstanceOf(JsonResponse::class, $response);
-    
+    //dd($response);
         $this->assertEquals(201, $response->getStatusCode());
     
         $responseData = $response->getData(true);
         $this->assertArrayHasKey('message', $responseData);
-        $this->assertEquals('Etudiant enregistré avec succés', $responseData['message']);
+        $this->assertEquals('Etudiant enregistré avec succès', $responseData['message']);
         $this->assertArrayHasKey('etudiant', $responseData);
     }
     

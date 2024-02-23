@@ -89,21 +89,21 @@ class LogementController extends Controller
      * Store a newly created resource in storage.
      */
 
-    /**
- * @OA\Post(
- *      path="/api/ajoutLogements",
- *      operationId="createLogement",
- *      tags={"Logements"},
- *      summary="Créer un nouveau logement",
- *      description="Crée un nouveau logement avec les détails fournis.",
- *      @OA\RequestBody(
- *          required=true,
- *          description="Données du logement",
- *          @OA\MediaType(
- *              mediaType="multipart/form-data",
- *              @OA\Schema(
- *                  required={"adresse", "type", "disponibilite", "description", "superficie", "prix", "equipements", "localite_id", "image"},
- *                  @OA\Property(property="adresse", type="string"),
+ 
+/**
+     * @OA\Post(
+     *     path="/api/ajoutLogements",
+     *     summary="Ajout d'une annonce",
+     *     security={
+     *         {"bearerAuth": {}}
+     *     },
+     *     tags={"Logements"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *              @OA\Property(property="adresse", type="string"),
  *                  @OA\Property(property="type", type="string"),
  *                  @OA\Property(property="disponibilite", type="string", format="date"),
  *                  @OA\Property(property="description", type="string"),
@@ -112,29 +112,20 @@ class LogementController extends Controller
  *                  @OA\Property(property="nombreChambre", type="integer"),
  *                  @OA\Property(property="equipements", type="string"),
  *                  @OA\Property(property="localite_id", type="integer"),
- *                  @OA\Property(property="image[]", type="array", @OA\Items(type="string", format="binary")),
- *              ),
- *          ),
- *      ),
- *      @OA\Response(
- *          response=200,
- *          description="Logement enregistré avec succès",
- *          @OA\JsonContent(
- *              @OA\Property(property="message", type="string", example="Logement enregistré avec succès"),
- *          ),
- *      ),
- *      @OA\Response(
- *          response=422,
- *          description="Erreur de validation",
- *          @OA\JsonContent(
- *          ),
- *      ),
- *      security={{"bearerAuth": {}}},
- * )
- */
-
+     *            @OA\Property(property="image[]",type="array",@OA\Items(type="string", format="binary"),description="Liste de fichiers images")
+     *         )
+     *        )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="annonce ajoutée avec succées",
+     *     ),
+     *     @OA\Response(response=401, description="Validation Error")
+     * )
+     */
 
     public function store(Request $request)
+
     {
         try {
             $validate = Validator::make($request->all(), [
@@ -173,8 +164,8 @@ class LogementController extends Controller
             $logements->save();
 
             $imagesData = [];
-
             foreach ($request->file('image') as $file) {
+                
                 $images = new Image();
                 $imagePath = $file->store('images/logement', 'public');
                 $images->nomImage = $imagePath;
@@ -405,7 +396,7 @@ class LogementController extends Controller
                     "message" => "Logement mis à jour avec succès",
                     "logement" => $logement,
                     // "images" => $logement->images
-                ]);
+                ], 200);
             } else {
                 return response()->json(["message" => "La mise à jour du logement a échoué"]);
             }

@@ -2408,26 +2408,13 @@
                 "tags": [
                     "Logements"
                 ],
-                "summary": "Créer un nouveau logement",
-                "description": "Crée un nouveau logement avec les détails fournis.",
-                "operationId": "createLogement",
+                "summary": "Ajout d'une annonce",
+                "operationId": "dd3af2877b66df505e498f86db30fabe",
                 "requestBody": {
-                    "description": "Données du logement",
                     "required": true,
                     "content": {
                         "multipart/form-data": {
                             "schema": {
-                                "required": [
-                                    "adresse",
-                                    "type",
-                                    "disponibilite",
-                                    "description",
-                                    "superficie",
-                                    "prix",
-                                    "equipements",
-                                    "localite_id",
-                                    "image"
-                                ],
                                 "properties": {
                                     "adresse": {
                                         "type": "string"
@@ -2458,6 +2445,7 @@
                                         "type": "integer"
                                     },
                                     "image[]": {
+                                        "description": "Liste de fichiers images",
                                         "type": "array",
                                         "items": {
                                             "type": "string",
@@ -2471,29 +2459,11 @@
                     }
                 },
                 "responses": {
-                    "200": {
-                        "description": "Logement enregistré avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Logement enregistré avec succès"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                    "201": {
+                        "description": "annonce ajoutée avec succées"
                     },
-                    "422": {
-                        "description": "Erreur de validation",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
+                    "401": {
+                        "description": "Validation Error"
                     }
                 },
                 "security": [

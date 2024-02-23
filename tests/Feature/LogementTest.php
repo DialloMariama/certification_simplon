@@ -54,14 +54,14 @@ class LogementTest extends TestCase
         $this->artisan('migrate:fresh');
         $admin = User::factory()->create(['role'=> 'admin']);
         $localite = Localite::factory()->create(['user_id' => $admin->id]);
-        $user = User::factory()->create(['role'=> 'proprietaire','telephone'=>'+221774067890','email'=>'magid5@gmail.com']);
+        $user = User::factory()->create(['role'=> 'proprietaire','telephone'=>'221774067890','email'=>'magid5@gmail.com']);
         $proprietaire = Proprietaire::factory()->create(['user_id' => $user->id]);
 
         $logement = Logement::factory()->create(['proprietaire_id' => $proprietaire->id]);
 
         $this->actingAs($user);
 
-        $response = $this->json('PUT', "/api/logements/{$logement->id}", [
+        $response = $this->json('POST', "/api/logements/{$logement->id}", [
             'type' => 'Maison',
             'adresse' => '456 Rue Secondaire',
             'description' => 'Nouvelle description du logement',
