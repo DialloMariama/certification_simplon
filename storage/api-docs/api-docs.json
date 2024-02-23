@@ -1081,6 +1081,158 @@
                 ]
             }
         },
+        "/api/validerInscription/{userId}": {
+            "put": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Valider l'inscription d'un utilisateur",
+                "description": "Valide l'inscription d'un utilisateur et envoie un e-mail de confirmation.",
+                "operationId": "validerInscription",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID de l'utilisateur à valider",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inscription validée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Inscription validée avec succès."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "L'utilisateur n'existe pas ou son inscription est déjà validée.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "L'utilisateur n'existe pas ou son inscription est déjà validée."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/rejeterInscription/{userId}": {
+            "put": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Rejeter l'inscription d'un utilisateur",
+                "description": "Rejette l'inscription d'un utilisateur et envoie un e-mail de notification de rejet.",
+                "operationId": "rejeterInscription",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID de l'utilisateur à rejeter",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inscription rejetée avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Inscription rejetée avec succès."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "L'utilisateur n'existe pas ou son inscription est déjà rejetée.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "L'utilisateur n'existe pas ou son inscription est déjà rejetée."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Une erreur s'est produite.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur s'est produite"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/ajoutCommentaire": {
             "post": {
                 "tags": [

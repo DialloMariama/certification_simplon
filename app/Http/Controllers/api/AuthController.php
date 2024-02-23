@@ -459,6 +459,47 @@ class AuthController extends Controller
     }
 
 
+    /**
+ * @OA\PUT(
+ *      path="/api/validerInscription/{userId}",
+ *      operationId="validerInscription",
+ *      tags={"Authentification"},
+ *      summary="Valider l'inscription d'un utilisateur",
+ *      description="Valide l'inscription d'un utilisateur et envoie un e-mail de confirmation.",
+ *      @OA\Parameter(
+ *          name="userId",
+ *          in="path",
+ *          description="ID de l'utilisateur à valider",
+ *          required=true,
+ *          @OA\Schema(
+ *              type="integer",
+ *          )
+ *      ),
+ *      @OA\Response(
+ *          response=200,
+ *          description="Inscription validée avec succès.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="Inscription validée avec succès."),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=404,
+ *          description="L'utilisateur n'existe pas ou son inscription est déjà validée.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="L'utilisateur n'existe pas ou son inscription est déjà validée."),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=500,
+ *          description="Une erreur s'est produite.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="Une erreur s'est produite"),
+ *          ),
+ *      ),
+ *      security={{"bearerAuth": {}}},
+ * )
+ */
+
     public function validerInscription($userId)
     {
         $user = User::findOrFail($userId);
@@ -473,6 +514,48 @@ class AuthController extends Controller
     
         return response()->json(['message' => 'L\'utilisateur n\'existe pas ou son inscription est déjà validée.'], 404);
     }
+
+    /**
+ * @OA\PUT(
+ *      path="/api/rejeterInscription/{userId}",
+ *      operationId="rejeterInscription",
+ *      tags={"Authentification"},
+ *      summary="Rejeter l'inscription d'un utilisateur",
+ *      description="Rejette l'inscription d'un utilisateur et envoie un e-mail de notification de rejet.",
+ *      @OA\Parameter(
+ *          name="userId",
+ *          in="path",
+ *          description="ID de l'utilisateur à rejeter",
+ *          required=true,
+ *          @OA\Schema(
+ *              type="integer",
+ *          )
+ *      ),
+ *      @OA\Response(
+ *          response=200,
+ *          description="Inscription rejetée avec succès.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="Inscription rejetée avec succès."),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=404,
+ *          description="L'utilisateur n'existe pas ou son inscription est déjà rejetée.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="L'utilisateur n'existe pas ou son inscription est déjà rejetée."),
+ *          ),
+ *      ),
+ *      @OA\Response(
+ *          response=500,
+ *          description="Une erreur s'est produite.",
+ *          @OA\JsonContent(
+ *              @OA\Property(property="message", type="string", example="Une erreur s'est produite"),
+ *          ),
+ *      ),
+ *      security={{"bearerAuth": {}}},
+ * )
+ */
+
     public function rejeterInscription($userId)
     {
         $user = User::findOrFail($userId);
