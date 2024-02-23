@@ -7,9 +7,12 @@ use App\Models\Etudiant;
 use App\Models\Logement;
 use App\Models\Proprietaire;
 use Illuminate\Http\Request;
+use App\Mail\rejeterInscrption;
+use App\Mail\ValiderInscrption;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * @OA\Tag(
@@ -464,9 +467,10 @@ class AuthController extends Controller
             $user->inscriptionValidee = 'valider';
             $user->save();
 
+            Mail::to($user->email)->send(new ValiderInscrption($user));
             return response()->json(['message' => 'Inscription validée avec succès.'], 200);
         }
-
+    
         return response()->json(['message' => 'L\'utilisateur n\'existe pas ou son inscription est déjà validée.'], 404);
     }
     public function rejeterInscription($userId)
@@ -477,9 +481,11 @@ class AuthController extends Controller
             $user->inscriptionValidee = 'rejeter';
             $user->save();
 
+            Mail::to($user->email)->send(new rejeterInscrption($user));
             return response()->json(['message' => 'Inscription rejetée avec succès.'], 200);
         }
 
         return response()->json(['message' => 'L\'utilisateur n\'existe pas ou son inscription est déjà rejetée.'], 404);
     }
+
 }
