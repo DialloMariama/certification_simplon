@@ -71,7 +71,7 @@ class EtudiantController extends Controller
                 'telephone' => 'required|string|regex:/^[0-9]+$/|unique:users|max:14',
                 'paysOrigine' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:100',
                 'universite' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:100',
-                'password' => 'required|string|min:6|max:8',
+                'password' => 'required|string|min:8|max:12',
                 'papierJustificatif' => 'required|file|max:2048',
                 'role' => 'required|string|in:etudiant',
             ]);

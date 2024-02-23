@@ -68,7 +68,7 @@ class ProprietaireController extends Controller
                 'prenom' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:50',
                 'adresse' => 'required|string|min:2|max:100|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ0-9 -]*$/',
                 'email' => 'required|unique:users,email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
-                'password' => 'required|string|min:6|max:8',
+                'password' => 'required|string|min:8|max:12',
                 'telephone' => 'required|string|regex:/^[0-9]+$/|unique:users|max:14',
                 'role' => 'required|string|in:proprietaire',
                 'papierJustificatif' => 'required|file|max:2048',
