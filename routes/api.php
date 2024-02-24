@@ -48,6 +48,8 @@ Route::middleware('auth:api', 'user')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('detailAnnonce/{id}', [AnnonceController::class, 'show']);
     Route::post('gmail.proprietaire/{id}', [LogementController::class, 'redirigerGmail']);
+    Route::get('localites', [LocaliteController::class, 'index']);
+
 });
 
 Route::middleware('auth:api', 'admin')->group(function () {
@@ -59,7 +61,6 @@ Route::middleware('auth:api', 'admin')->group(function () {
     Route::get('etudiants', [AuthController::class, 'listeEtudiantsNonBloques']);
     Route::get('proprietaires', [AuthController::class, 'listeProprietairesNonBloques']);
     Route::post('ajoutLocalites', [LocaliteController::class, 'store']);
-    Route::get('localites', [LocaliteController::class, 'index']);
     Route::put('localites/{id}', [LocaliteController::class, 'update']);
     Route::put('validerInscription/{userId}', [AuthController::class, 'validerInscription']);
     Route::put('rejeterInscription/{userId}', [AuthController::class, 'rejeterInscription']);

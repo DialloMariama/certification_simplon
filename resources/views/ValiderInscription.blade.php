@@ -7,6 +7,6 @@
 </head>
 <body>
     <h1>Approbation d'inscription</h1>
-    <p>Bonjour! nous sommes ravis de vous annoncer que votre inscription a été approuvée</p>
+    <h3>Bonjour! nous sommes ravis de vous annoncer que votre inscription a été approuvée</h3>
 </body>
 </html>
