@@ -17,7 +17,17 @@ class NewsletterController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            $subscribers = Newsletter::select('email')->get();
+            
+            return response()->json([
+                'subscribers' => $subscribers
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => $th->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -70,7 +80,8 @@ class NewsletterController extends Controller
     {
         try {
             $validate = Validator::make($request->all(), [
-                'email' => 'required|string|email|max:255|unique:newsletters',
+                'email' => 'required|unique:newsletters,email|regex:/^[a-zA-Z0-9]+@[a-z]+\.[a-z]{2,6}$/',
+
             ]);
             if ($validate->fails()) {
                 return response()->json([

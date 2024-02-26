@@ -68,6 +68,8 @@ Route::middleware('auth:api', 'admin')->group(function () {
     Route::get('logementsAdmin', [LogementController::class, 'index']);
     Route::delete('supprimerCommentaires/{id}', [CommentaireController::class, 'destroyByAdmin']);
     Route::delete('supprimerAnnonces/{id}', [AnnonceController::class, 'destroyByAdmin']);
+    Route::get('listeNewsletter', [NewsletterController::class, 'index']);
+
 });
 
 Route::middleware('auth:api', 'etudiant')->group(function () {
