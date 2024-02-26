@@ -26,6 +26,8 @@ class LogementRessource extends JsonResource
             'proprietaire' => $this->proprietaire->user->nom,
             'proprietairePrenom' => $this->proprietaire->user->prenom,
             'image' => $this->images,
+            'commentaire' => CommentaireRessource::collection($this->commentaires) ,
+
             
         ];
     }

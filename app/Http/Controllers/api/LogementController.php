@@ -72,7 +72,8 @@ class LogementController extends Controller
         } catch (ModelNotFoundException $e) {
             return response()->json(["message" => "Logement non trouvé"], 404);
         } catch (\Exception $e) {
-            return response()->json(["message" => "Une erreur s'est produite"], 500);
+            // return response()->json(["message" => "Une erreur s'est produite"], 500);
+            return response()->json(["erreur" =>$e->getMessage() ], 500);
         }
     }
 
@@ -237,6 +238,8 @@ class LogementController extends Controller
                 'localite',
                 'proprietaire',
                 'images',
+                'commentaires',
+
             ]
         )->get();
         return LogementDetailRessource::collection($logements);

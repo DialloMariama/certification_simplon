@@ -31,6 +31,7 @@ class LogementDetailRessource extends JsonResource
             'proprietaireTelephone' => $this->proprietaire->user->telephone,
             'proprietaireEmail' => $this->proprietaire->user->email,
             'image' => $this->images,
+            'commentaire' => CommentaireRessource::collection($this->commentaires) ,
             
         ];
     }

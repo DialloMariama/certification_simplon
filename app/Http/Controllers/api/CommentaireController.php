@@ -104,7 +104,6 @@ class CommentaireController extends Controller
                 'error' => $validate->errors()
             ]);
         }
-    
         $etudiant = Etudiant::where('user_id', Auth::user()->id)->first();
         $commentaire = new Commentaire();
         $commentaire->texte = $request->input('texte');
