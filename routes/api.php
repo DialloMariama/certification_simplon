@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\ForgotPasswordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\AuthController;
@@ -11,7 +12,7 @@ use App\Http\Controllers\api\LogementController;
 use App\Http\Controllers\api\NewsletterController;
 use App\Http\Controllers\api\CommentaireController;
 use App\Http\Controllers\api\ProprietaireController;
-use App\Http\Controllers\api\ForgotPasswordController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -32,6 +33,8 @@ Route::post('newsletter', [NewsletterController::class, 'create']);
 Route::post('forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
 Route::get('reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
 Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
+Route::get('/password/reset/success', [ForgotPasswordController::class,'showResetPasswordSuccess'])->name('password.reset.success');
+
 
 Route::post('inscriptionEtudiant', [EtudiantController::class, 'registerEtudiant']);
 Route::post('inscriptionProprietaire', [ProprietaireController::class, 'registerProprietaire']);
