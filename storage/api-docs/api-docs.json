@@ -1698,7 +1698,7 @@
             }
         },
         "/api/updateEtudiant": {
-            "put": {
+            "post": {
                 "tags": [
                     "Etudiants"
                 ],
@@ -1887,67 +1887,6 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/api/forget-password": {
-            "post": {
-                "tags": [
-                    "Mot de passe oublié"
-                ],
-                "summary": "Soumettre le mail de récupération de mot de passe",
-                "description": "Soumet le formulaire de récupération de mot de passe en envoyant un email avec un lien de réinitialisation.",
-                "operationId": "submitForgetPasswordForm",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "user@example.com"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Email de récupération envoyé avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Nous vous avons envoyé un email de récupération!"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Données invalides",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "example": "Données invalides!"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                }
             }
         },
         "/api/ajoutImage/{id}": {
@@ -2930,7 +2869,7 @@
             }
         },
         "/api/whatsapp.proprietaire/{id}": {
-            "get": {
+            "post": {
                 "tags": [
                     "WhatsApp"
                 ],
@@ -3239,7 +3178,7 @@
             }
         },
         "/api/updateProprietaire": {
-            "put": {
+            "post": {
                 "tags": [
                     "Propriétaires"
                 ],
@@ -3247,20 +3186,10 @@
                 "description": "Permet au propriétaire de mettre à jour ses informations personnelles.",
                 "operationId": "updateProprietaire",
                 "requestBody": {
-                    "description": "Données à mettre à jour",
                     "required": true,
                     "content": {
                         "multipart/form-data": {
                             "schema": {
-                                "required": [
-                                    "nom",
-                                    "prenom",
-                                    "adresse",
-                                    "telephone",
-                                    "email",
-                                    "password",
-                                    "papierJustificatif"
-                                ],
                                 "properties": {
                                     "nom": {
                                         "type": "string",
@@ -3446,10 +3375,6 @@
         {
             "name": "Etudiants",
             "description": "Points de terminaison API pour la gestion des Etudiants"
-        },
-        {
-            "name": "Mot de passe oublié",
-            "description": "Points de terminaison API pour la gestion Mot de passe oublié "
         },
         {
             "name": "Images",

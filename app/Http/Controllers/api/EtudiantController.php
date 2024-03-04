@@ -72,7 +72,8 @@ class EtudiantController extends Controller
                 'paysOrigine' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:100',
                 'universite' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:100',
                 'password' => 'required|string|min:8|max:12',
-                'papierJustificatif' => 'required|file|max:2048',
+                // 'papierJustificatif' => 'required|file|max:2048',
+                'papierJustificatif' => 'required|file|mimetypes:application/pdf,image/jpeg,image/png|max:2048',
                 'role' => 'required|string|in:etudiant',
             ]);
             if ($validate->fails()) {
@@ -119,7 +120,7 @@ class EtudiantController extends Controller
 
 
 /**
- * @OA\Put(
+ * @OA\Post(
  *      path="/api/updateEtudiant",
  *      operationId="updateEtudiant",
  *      tags={"Etudiants"},
@@ -184,7 +185,9 @@ class EtudiantController extends Controller
                 'telephone' => 'required|string|regex:/^[0-9]+$/|min:9|max:14',
                 'paysOrigine' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:100',
                 'universite' => 'required|string|max:255|regex:/^[A-Za-zÀ-ÖØ-öø-ÿ -]+$/|min:2|max:100',
-                'papierJustificatif' => 'nullable|file|max:2048',
+                'password' => 'nullable|string|min:8|max:12',
+                'papierJustificatif' => 'nullable|file|mimetypes:application/pdf,image/jpeg,image/png|max:2048',
+
             ]);
             if ($validate->fails()) {
                 return response()->json([

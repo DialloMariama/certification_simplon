@@ -73,7 +73,7 @@ class LogementController extends Controller
             return response()->json(["message" => "Logement non trouvé"], 404);
         } catch (\Exception $e) {
             // return response()->json(["message" => "Une erreur s'est produite"], 500);
-            return response()->json(["erreur" =>$e->getMessage() ], 500);
+            return response()->json(["erreur" => $e->getMessage()], 500);
         }
     }
 
@@ -90,8 +90,8 @@ class LogementController extends Controller
      * Store a newly created resource in storage.
      */
 
- 
-/**
+
+    /**
      * @OA\Post(
      *     path="/api/ajoutLogements",
      *     summary="Ajout d'une annonce",
@@ -105,14 +105,14 @@ class LogementController extends Controller
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
      *              @OA\Property(property="adresse", type="string"),
- *                  @OA\Property(property="type", type="string"),
- *                  @OA\Property(property="disponibilite", type="string", format="date"),
- *                  @OA\Property(property="description", type="string"),
- *                  @OA\Property(property="superficie", type="number"),
- *                  @OA\Property(property="prix", type="number"),
- *                  @OA\Property(property="nombreChambre", type="integer"),
- *                  @OA\Property(property="equipements", type="string"),
- *                  @OA\Property(property="localite_id", type="integer"),
+     *                  @OA\Property(property="type", type="string"),
+     *                  @OA\Property(property="disponibilite", type="string", format="date"),
+     *                  @OA\Property(property="description", type="string"),
+     *                  @OA\Property(property="superficie", type="number"),
+     *                  @OA\Property(property="prix", type="number"),
+     *                  @OA\Property(property="nombreChambre", type="integer"),
+     *                  @OA\Property(property="equipements", type="string"),
+     *                  @OA\Property(property="localite_id", type="integer"),
      *            @OA\Property(property="image[]",type="array",@OA\Items(type="string", format="binary"),description="Liste de fichiers images")
      *         )
      *        )
@@ -132,14 +132,14 @@ class LogementController extends Controller
             $validate = Validator::make($request->all(), [
                 'adresse' => 'required|string|max:255',
                 'type' => 'required|string|max:255',
-                'disponibilite' => 'required|date',
+                'disponibilite' => 'required|date|after_or_equal:today',
                 'description' => 'required|string',
                 'superficie' => 'required|numeric',
                 'prix' => 'required|numeric',
                 'nombreChambre' => 'nullable|integer|min:1',
                 'equipements' => 'required|string|max:255',
                 'localite_id' => 'required|exists:localites,id',
-                'image.*' => 'required|file',
+                'image.*' => 'required|file|mimetypes:image/jpeg,image/png|max:2048',
             ]);
             if ($validate->fails()) {
                 return response()->json([
@@ -166,7 +166,7 @@ class LogementController extends Controller
 
             $imagesData = [];
             foreach ($request->file('image') as $file) {
-                
+
                 $images = new Image();
                 $imagePath = $file->store('images/logement', 'public');
                 $images->nomImage = $imagePath;
@@ -350,14 +350,14 @@ class LogementController extends Controller
             $validate = Validator::make($request->all(), [
                 'adresse' => 'required|string|max:255',
                 'type' => 'required|string|max:255',
-                'disponibilite' => 'required|date',
+                'disponibilite' => 'required|date|after_or_equal:today',
                 'description' => 'required|string',
                 'superficie' => 'required|numeric',
                 'prix' => 'required|numeric',
                 'nombreChambre' => 'required|integer|min:1',
                 'equipements' => 'required|string|max:255',
                 'localite_id' => 'required|exists:localites,id',
-                'image.*' => 'nullable|file',
+                'image.*' => 'nullable|file|mimetypes:image/jpeg,image/png|max:2048',
             ]);
             if ($validate->fails()) {
                 return response()->json([
@@ -485,7 +485,7 @@ class LogementController extends Controller
 
 
     /**
-     * @OA\Get(
+     * @OA\Post(
      *      path="/api/whatsapp.proprietaire/{id}",
      *      operationId="redirigerWhatsApp",
      *      tags={"WhatsApp"},

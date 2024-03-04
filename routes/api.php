@@ -76,7 +76,7 @@ Route::middleware('auth:api', 'admin')->group(function () {
 });
 
 Route::middleware('auth:api', 'etudiant')->group(function () {
-    Route::put('updateEtudiant', [EtudiantController::class, 'updateEtudiant']);
+    Route::post('updateEtudiant', [EtudiantController::class, 'updateEtudiant']);
     Route::post('ajoutCommentaire', [CommentaireController::class, 'store']);
     Route::put('commentaires/{commentaire}', [CommentaireController::class, 'update']);
     Route::delete('commentaires/{id}', [CommentaireController::class, 'destroy']);
@@ -88,7 +88,7 @@ Route::middleware('auth:api', 'etudiant')->group(function () {
 });
 
 Route::middleware('auth:api', 'proprietaire')->group(function () {
-    Route::put('updateProprietaire', [ProprietaireController::class, 'updateProprietaire']);
+    Route::post('updateProprietaire', [ProprietaireController::class, 'updateProprietaire']);
     Route::post('ajoutLogements', [LogementController::class, 'store']);
     Route::post('logements/{id}', [LogementController::class, 'update']);
     Route::delete('logements/{id}', [LogementController::class, 'destroy']);
